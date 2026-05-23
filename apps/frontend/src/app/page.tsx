@@ -17,6 +17,18 @@ export default function LandingPage() {
   const [status, setStatus] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const getFriendlyError = (message: string) => {
+    if (message.includes('Invalid credentials')) {
+      return 'Email sau parola sunt incorecte. Daca nu ai cont, apasa pe "Nu ai cont? Inregistreaza-te".';
+    }
+
+    if (message.includes('Email already in use')) {
+      return 'Exista deja un cont cu acest email. Incearca autentificarea.';
+    }
+
+    return 'Ceva nu a mers. Te rog incearca din nou.';
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
@@ -33,7 +45,7 @@ export default function LandingPage() {
       router.push('/home');
     } catch (error) {
       const message = error instanceof Error ? error.message : '';
-      setStatus(message ? `Ceva nu a mers. Te rog încearcă din nou. (${message})` : 'Ceva nu a mers. Te rog încearcă din nou.');
+      setStatus(getFriendlyError(message));
     } finally {
       setLoading(false);
     }
@@ -53,6 +65,18 @@ export default function LandingPage() {
           <Link className="button button-secondary" href="/home">
             Continuă dacă ești deja autentificat
           </Link>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => {
+              setMode('login');
+              setEmail('demo@vorbesc-cu-dumnezeu.ro');
+              setPassword('Demo1234!');
+              setStatus('Date demo completate. Apasa "Intra in cont".');
+            }}
+          >
+            Completeaza contul demo
+          </Button>
         </div>
       </section>
 

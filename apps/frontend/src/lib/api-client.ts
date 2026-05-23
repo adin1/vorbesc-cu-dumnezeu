@@ -18,8 +18,26 @@ async function request<T>(
   });
 
   if (!response.ok) {
-    const message = await response.text();
-    throw new Error(message || `Request failed: ${response.status}`);
+    let message = `Request failed: ${response.status}`;
+    const contentType = response.headers.get('content-type') ?? '';
+
+    if (contentType.includes('application/json')) {
+      const payload = (await response.json()) as { message?: string | string[]; error?: string };
+      if (Array.isArray(payload.message)) {
+        message = payload.message.join(', ');
+      } else if (typeof payload.message === 'string' && payload.message.length > 0) {
+        message = payload.message;
+      } else if (typeof payload.error === 'string' && payload.error.length > 0) {
+        message = payload.error;
+      }
+    } else {
+      const text = await response.text();
+      if (text.length > 0) {
+        message = text;
+      }
+    }
+
+    throw new Error(message);
   }
 
   return response.json() as Promise<T>;
