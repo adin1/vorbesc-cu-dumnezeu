@@ -3,7 +3,7 @@
 MVP spiritual creștin, fără API extern AI, cu ghid spiritual bazat pe date predefinite din baza de date.
 
 ## Aplicație live
-- https://frontend-zeta-taupe-39.vercel.app
+- https://vorbeste-cu-dumnezeu.vercel.app
 
 ## Stack
 - Frontend: Next.js 16 + TypeScript
