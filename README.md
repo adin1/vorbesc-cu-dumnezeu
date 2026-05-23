@@ -67,3 +67,6 @@ Setări producție:
 - `JWT_SECRET` -> valoare puternică
 - `NEXT_PUBLIC_API_URL` -> URL backend public
 - `FRONTEND_URL` -> domeniul frontend pentru CORS
+
+Ghid complet pas cu pas (Vercel + Railway):
+- vezi `DEPLOY.md`
