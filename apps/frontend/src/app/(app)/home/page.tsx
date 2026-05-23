@@ -11,6 +11,7 @@ import {
   getDashboard,
   getDashboardCachePermissions,
   getDashboardCacheStats,
+  getSpiritualDaily,
   me,
   resetDashboardCacheStats,
   type DashboardCacheStats,
@@ -35,6 +36,10 @@ export default function HomePage() {
   const [cacheStats, setCacheStats] = useState<DashboardCacheStats | null>(null);
   const [cacheBusy, setCacheBusy] = useState(false);
   const [canClearAllCache, setCanClearAllCache] = useState(false);
+  const [verseOfDay, setVerseOfDay] = useState('Filipeni 4:6-7 - Nu vă îngrijorați de nimic.');
+  const [prayerOfDay, setPrayerOfDay] = useState(
+    'Doamne, dă-mi pace în inimă și claritate în gânduri pentru ziua aceasta.',
+  );
 
   const refreshCacheStats = (token: string) => {
     return getDashboardCacheStats(token)
@@ -74,6 +79,13 @@ export default function HomePage() {
         .then((perm) => setCanClearAllCache(perm.canClearAll))
         .catch(() => setCanClearAllCache(false));
     }
+
+    getSpiritualDaily(token)
+      .then((daily) => {
+        setVerseOfDay(daily.verseOfDay);
+        setPrayerOfDay(daily.prayerOfDay);
+      })
+      .catch(() => undefined);
   }, []);
 
   const handleResetCacheStats = async () => {
@@ -273,7 +285,7 @@ export default function HomePage() {
         ) : (
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             <Link className="button" href="/chat">
-              Deschide chat
+              Deschide ghidul spiritual
             </Link>
             <Link className="button button-secondary" href="/journal">
               Adaugă în jurnal
@@ -362,19 +374,19 @@ export default function HomePage() {
       ) : null}
       <Card>
         <h3>Versetul zilei</h3>
-        <p>Filipeni 4:6-7 - Nu vă îngrijorați de nimic, ci în orice lucru aduceți cererile voastre la cunoștința lui Dumnezeu.</p>
+        <p>{verseOfDay}</p>
       </Card>
       <Card>
         <h3>Rugăciunea zilei</h3>
-        <p>Doamne, dă-mi pace în inimă și claritate în gânduri pentru ziua aceasta.</p>
+        <p>{prayerOfDay}</p>
       </Card>
       <Card>
         <h3>Cum te simți azi?</h3>
-        <p className="muted">Jurnal rapid pentru starea sufletească.</p>
+        <p className="muted">Deschide Ghidul spiritual sau jurnalul pentru un pas mic de liniște.</p>
       </Card>
       <Card>
         <h3>Vorbește cu Dumnezeu</h3>
-        <p className="muted">Buton principal pentru conversația spirituală AI.</p>
+        <p className="muted">Buton principal pentru Ghidul spiritual.</p>
       </Card>
       <Card>
         <p>Acces rapid: jurnal, rugăciuni, planuri spirituale.</p>

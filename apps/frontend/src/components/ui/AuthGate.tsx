@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { getToken } from '@/lib/auth-token';
 
@@ -9,6 +10,7 @@ type AuthGateProps = {
 };
 
 export function AuthGate({ children }: AuthGateProps) {
+  const router = useRouter();
   const [isChecking, setIsChecking] = useState(true);
   const [isAuthed, setIsAuthed] = useState(false);
 
@@ -16,7 +18,11 @@ export function AuthGate({ children }: AuthGateProps) {
     const token = getToken();
     setIsAuthed(Boolean(token));
     setIsChecking(false);
-  }, []);
+
+    if (!token) {
+      router.replace('/');
+    }
+  }, [router]);
 
   if (isChecking) {
     return <p className="muted">Se verifică autentificarea...</p>;

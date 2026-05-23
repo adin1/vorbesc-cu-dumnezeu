@@ -32,8 +32,8 @@ export default function LandingPage() {
       setStatus('Autentificare reușită. Redirecționare...');
       router.push('/home');
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Eroare necunoscută';
-      setStatus(`Eroare: ${message}`);
+      const message = error instanceof Error ? error.message : '';
+      setStatus(message ? `Ceva nu a mers. Te rog încearcă din nou. (${message})` : 'Ceva nu a mers. Te rog încearcă din nou.');
     } finally {
       setLoading(false);
     }
@@ -46,9 +46,9 @@ export default function LandingPage() {
           Vorbește cu Dumnezeu
         </h1>
         <p>
-          Companion spiritual AI care oferă răspunsuri inspirate din Biblie, rugăciune și reflecție
-          creștină.
+          Ghid spiritual creștin cu răspunsuri blânde, rugăciuni și versete pentru fiecare zi.
         </p>
+        <p className="muted">Cont demo: demo@vorbesc-cu-dumnezeu.ro / Demo1234!</p>
         <div style={{ display: 'flex', gap: 10 }}>
           <Link className="button button-secondary" href="/home">
             Continuă dacă ești deja autentificat

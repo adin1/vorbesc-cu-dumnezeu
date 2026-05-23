@@ -1,56 +1,69 @@
 # Vorbește cu Dumnezeu
 
-Aplicație creștină/spirituală modernă cu companion spiritual AI care oferă răspunsuri inspirate din Biblie, rugăciune și reflecție creștină.
-
-## Disclaimer
-Răspunsurile sunt generate automat pentru sprijin spiritual și nu înlocuiesc preotul, duhovnicul, psihologul sau ajutorul de urgență.
+MVP spiritual creștin, fără API extern AI, cu ghid spiritual bazat pe date predefinite din baza de date.
 
 ## Stack
-- Frontend: Next.js (TypeScript)
-- Backend: NestJS + Prisma (SQLite local dev fallback, PostgreSQL-ready architecture)
-- Auth: JWT
-- Monorepo: npm workspaces
+- Frontend: Next.js 16 + TypeScript
+- Backend: NestJS 10 + Prisma
+- Bază locală: SQLite
+- Producție recomandată: PostgreSQL
 
-## Structură
-- `apps/frontend` - aplicația web
-- `apps/backend` - API REST NestJS
-
-## Instalare
+## Instalare și rulare locală
 1. Instalează dependențele:
    - `npm install`
-2. Pentru rulare rapidă locală, proiectul folosește SQLite prin `.env`.
-3. Pentru PostgreSQL (producție), schimbă `provider` în `postgresql` în `apps/backend/prisma/schema.prisma` și setează `DATABASE_URL` corespunzător.
-4. Configurează variabilele:
+2. Configurează variabilele de mediu:
    - copiază `.env.example` în `.env`
-5. Generează clientul Prisma:
-   - `npm run prisma:generate -w apps/backend`
-6. Rulează migrațiile:
-   - `npm run prisma:migrate -w apps/backend`
-7. Rulează seed pentru mock data:
-   - `npm run prisma:seed -w apps/backend`
-8. Pornește backend și frontend în terminale separate:
-   - `npm run dev:backend`
-   - `npm run dev:frontend`
+3. Rulează migrațiile:
+   - `npm run db:migrate`
+4. Rulează seed-ul cu date reale demo:
+   - `npm run db:seed`
+5. Pornește aplicația:
+   - `npm run dev`
 
-## API principal
+## Comenzi principale
+- `npm install`
+- `npm run db:migrate`
+- `npm run db:seed`
+- `npm run dev`
+- `npm run build`
+- `npm run test`
+
+## Date demo login
+- Email: `demo@vorbesc-cu-dumnezeu.ro`
+- Parolă: `Demo1234!`
+
+## Endpointuri principale
 - Auth: `/auth/register`, `/auth/login`, `/auth/me`
-- AI: `/ai/chat`, `/ai/generate-prayer`, `/ai/explain-verse`
-- Journal: `/journal`, `/journal/export`
-- Prayers: `/prayers`, `/prayers/categories`, `/prayers/generate`
-- Plans: `/plans`, `/plans/:id`, `/plans/:id/start`, `/plans/progress/:id`
-- Community: `/prayer-requests`, `/prayer-requests/:id/support`, `/prayer-requests/:id/report`
-- GDPR: `/gdpr/export`, `/gdpr/delete-account`
-- Dashboard cache diagnostics:
-   - `/profile/dashboard/cache-stats`
-   - `/profile/dashboard/cache-stats/reset`
-   - `/profile/dashboard/cache/clear`
-   - `/profile/dashboard/cache/clear-all` (doar pentru `DASHBOARD_CACHE_ADMIN_EMAIL`)
+- Ghid spiritual: `/spiritual-guide/moods`, `/spiritual-guide/daily`, `/spiritual-guide/message`
+- Rugăciuni: `/prayers`, `/prayers/categories`, `/prayers/:id/save`
+- Jurnal: `/journal`, `/journal/export`
+- Planuri: `/plans`, `/plans/:id`, `/plans/:id/start`, `/plans/progress/:id`
+- Comunitate: `/prayer-requests`, `/prayer-requests/:id/support`, `/prayer-requests/:id/report`
+- Profil: `/profile`, `/profile/preferences`, `/profile/favorite-verses`, `/profile/saved-prayers`
+- Notificări: `/notifications`, `/notifications/:id/read`, `/notifications/read-all`
+- Admin: `/admin/metrics`
+- Health: `/health`
 
-## Feature flags
-- `NEXT_PUBLIC_ENABLE_DASHBOARD_DIAGNOSTICS=true` activează cardul de diagnostic cache în frontend.
+## Health check
+`GET /health`
 
-## Rate limiting operații cache
-- Endpointurile de operații cache (`cache-stats/reset`, `cache/clear`, `cache/clear-all`) sunt limitate per utilizator.
-- Variabile configurabile:
-   - `DASHBOARD_CACHE_OP_WINDOW_MS` (implicit 60000)
-   - `DASHBOARD_CACHE_OP_MAX_REQUESTS` (implicit 8)
+Răspuns:
+
+```json
+{
+  "status": "ok",
+  "database": "connected",
+  "version": "1.0.0"
+}
+```
+
+## Deploy recomandat
+- Frontend: Vercel
+- Backend: Railway / Render / Fly.io
+- DB: PostgreSQL
+
+Setări producție:
+- `DATABASE_URL` -> PostgreSQL
+- `JWT_SECRET` -> valoare puternică
+- `NEXT_PUBLIC_API_URL` -> URL backend public
+- `FRONTEND_URL` -> domeniul frontend pentru CORS

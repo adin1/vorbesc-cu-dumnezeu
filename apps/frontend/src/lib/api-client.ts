@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
 type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'DELETE';
 
@@ -44,6 +44,34 @@ export type ChatResponse = {
     reflectionQuestion: string;
   };
   disclaimer: string;
+};
+
+export type SpiritualGuideMood = {
+  id: string;
+  slug: string;
+  name: string;
+};
+
+export type SpiritualGuideResponse = {
+  mood: string;
+  warmMessage: string;
+  verse: string;
+  prayer: string;
+  reflectionQuestion: string;
+};
+
+export type SpiritualDailyResponse = {
+  verseOfDay: string;
+  prayerOfDay: string;
+};
+
+export type AdminMetricsResponse = {
+  users: number;
+  prayers: number;
+  journalEntries: number;
+  prayerRequests: number;
+  activePlans: number;
+  refreshedAt: string;
 };
 
 export type Prayer = {
@@ -218,6 +246,27 @@ export function me(token: string) {
 
 export function aiChat(token: string, message: string) {
   return request<ChatResponse>('/ai/chat', 'POST', { message }, token);
+}
+
+export function getSpiritualMoods(token: string) {
+  return request<SpiritualGuideMood[]>('/spiritual-guide/moods', 'GET', undefined, token).then((items) =>
+    items.map((item) => ({ id: item.id, slug: item.slug, name: item.name })),
+  );
+}
+
+export function getSpiritualDaily(token: string) {
+  return request<SpiritualDailyResponse>('/spiritual-guide/daily', 'GET', undefined, token);
+}
+
+export function sendSpiritualMessage(
+  token: string,
+  payload: { moodId?: string; mood?: string; userText?: string },
+) {
+  return request<SpiritualGuideResponse>('/spiritual-guide/message', 'POST', payload, token);
+}
+
+export function getAdminMetrics(token: string) {
+  return request<AdminMetricsResponse>('/admin/metrics', 'GET', undefined, token);
 }
 
 export function getPrayers(token: string) {

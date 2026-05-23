@@ -7,7 +7,7 @@ const sans = Nunito({ subsets: ['latin'], variable: '--font-sans' });
 
 export const metadata: Metadata = {
   title: 'Vorbește cu Dumnezeu',
-  description: 'Companion spiritual AI inspirat de Biblie, rugăciune și reflecție creștină.',
+  description: 'Ghid spiritual creștin cu rugăciuni, versete și reflecție zilnică.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

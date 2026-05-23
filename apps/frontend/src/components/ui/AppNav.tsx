@@ -5,14 +5,15 @@ import { useRouter } from 'next/navigation';
 import { clearToken } from '@/lib/auth-token';
 
 const links = [
-  { href: '/home', label: 'Home' },
-  { href: '/chat', label: 'Chat spiritual AI' },
+  { href: '/home', label: 'Acasă' },
+  { href: '/chat', label: 'Ghid spiritual' },
   { href: '/prayers', label: 'Rugăciuni' },
   { href: '/journal', label: 'Jurnal' },
   { href: '/plans', label: 'Planuri' },
   { href: '/community', label: 'Comunitate' },
   { href: '/notifications', label: 'Notificari' },
   { href: '/profile', label: 'Profil' },
+  { href: '/admin', label: 'Admin' },
 ];
 
 export function AppNav() {
@@ -31,7 +32,7 @@ export function AppNav() {
         </Link>
       ))}
       <button className="button button-secondary" type="button" onClick={handleLogout}>
-        Logout
+        Ieșire
       </button>
     </nav>
   );

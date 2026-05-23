@@ -30,6 +30,42 @@ model User {
   gdprRequests      GdprRequest[]
 }
 
+model SpiritualMood {
+  id        String      @id @default(cuid())
+  slug      String      @unique
+  name      String      @unique
+  createdAt DateTime    @default(now())
+  guides    MoodGuide[]
+}
+
+model MoodGuide {
+  id                 String        @id @default(cuid())
+  moodId             String
+  warmMessage        String
+  verse              String
+  shortPrayer        String
+  reflectionQuestion String
+  createdAt          DateTime      @default(now())
+  mood               SpiritualMood @relation(fields: [moodId], references: [id], onDelete: Cascade)
+
+  @@unique([moodId])
+}
+
+model Verse {
+  id        String    @id @default(cuid())
+  reference String
+  text      String
+  topic     String
+  createdAt DateTime  @default(now())
+}
+
+model EncouragementMessage {
+  id        String    @id @default(cuid())
+  topic     String
+  message   String
+  createdAt DateTime  @default(now())
+}
+
 model SpiritualPreference {
   id                String        @id @default(cuid())
   userId            String        @unique
