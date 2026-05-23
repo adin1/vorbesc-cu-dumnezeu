@@ -100,6 +100,12 @@ export type Prayer = {
   userId?: string;
 };
 
+export type GeneratedPrayerResponse = {
+  topic: string;
+  prayer: string;
+  suggestion: string;
+};
+
 export type SpiritualPlan = {
   id: string;
   title: string;
@@ -289,6 +295,17 @@ export function getAdminMetrics(token: string) {
 
 export function getPrayers(token: string) {
   return request<Prayer[]>('/prayers', 'GET', undefined, token);
+}
+
+export function generatePrayer(token: string, topic: string) {
+  return request<GeneratedPrayerResponse>('/prayers/generate', 'POST', { topic }, token);
+}
+
+export function saveGeneratedPrayer(
+  token: string,
+  payload: { topic: string; prayer: string; suggestion?: string },
+) {
+  return request<Prayer>('/prayers/save-generated', 'POST', payload, token);
 }
 
 export function getPlans(token: string) {

@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import { DashboardCacheService } from '../../common/dashboard-cache.service';
+import { SaveGeneratedPrayerDto } from './dto';
 
 @Injectable()
 export class PrayersService {
@@ -28,6 +29,37 @@ export class PrayersService {
         'Doamne, în această zi îți încredințez acest gând. Lucrează în inima mea cu pace, răbdare și înțelepciune. Amin.',
       suggestion: 'Recitește Psalmul 23 și stai 3 minute în liniște.',
     };
+  }
+
+  async saveGeneratedPrayerForUser(userId: string, dto: SaveGeneratedPrayerDto) {
+    const category = await this.prisma.prayerCategory.upsert({
+      where: { name: 'Personalizata' },
+      update: {},
+      create: { name: 'Personalizata' },
+    });
+
+    const created = await this.prisma.prayer.create({
+      data: {
+        userId,
+        categoryId: category.id,
+        title: `Rugaciune personalizata - ${dto.topic}`,
+        content: dto.prayer,
+        isGenerated: true,
+      },
+      include: { category: true },
+    });
+
+    await this.prisma.notification.create({
+      data: {
+        userId,
+        title: 'Rugaciune generata salvata',
+        body: `Rugaciunea pentru tema "${dto.topic}" a fost adaugata in profilul tau.`,
+      },
+    });
+
+    this.dashboardCache.invalidateUser(userId);
+
+    return created;
   }
 
   async savePrayerForUser(userId: string, prayerId: string) {
