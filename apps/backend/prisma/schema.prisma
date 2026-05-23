@@ -1,0 +1,181 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String               @id @default(cuid())
+  email             String               @unique
+  passwordHash      String
+  name              String
+  denomination      String               @default("GENERAL")
+  dailyStreak       Int                  @default(0)
+  notifyDaily       Boolean              @default(true)
+  notifyCommunity   Boolean              @default(true)
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+  spiritualPreference SpiritualPreference?
+  chatSessions      ChatSession[]
+  prayers           Prayer[]
+  journalEntries    JournalEntry[]
+  userPlanProgress  UserPlanProgress[]
+  favoriteVerses    FavoriteVerse[]
+  prayerRequests    PrayerRequest[]
+  prayerSupports    PrayerSupport[]
+  notifications     Notification[]
+  gdprRequests      GdprRequest[]
+}
+
+model SpiritualPreference {
+  id                String        @id @default(cuid())
+  userId            String        @unique
+  preferredTone     String        @default("GENTLE")
+  spiritualGoal     String
+  confession        String        @default("GENERAL")
+  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+}
+
+model ChatSession {
+  id           String        @id @default(cuid())
+  userId       String
+  title        String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages     ChatMessage[]
+}
+
+model ChatMessage {
+  id           String      @id @default(cuid())
+  sessionId    String
+  role         String
+  content      String
+  createdAt    DateTime    @default(now())
+  session      ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+}
+
+model PrayerCategory {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  prayers   Prayer[]
+  createdAt DateTime  @default(now())
+}
+
+model Prayer {
+  id          String          @id @default(cuid())
+  userId      String?
+  categoryId  String
+  title       String
+  content     String
+  isGenerated Boolean         @default(false)
+  createdAt   DateTime        @default(now())
+  user        User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  category    PrayerCategory  @relation(fields: [categoryId], references: [id])
+}
+
+model JournalEntry {
+  id          String    @id @default(cuid())
+  userId      String
+  mood        String
+  burden      String
+  gratitude   String
+  prayerToday String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([id, userId])
+}
+
+model SpiritualPlan {
+  id           String            @id @default(cuid())
+  title        String
+  description  String
+  durationDays Int
+  createdAt    DateTime          @default(now())
+  days         SpiritualPlanDay[]
+  progress     UserPlanProgress[]
+}
+
+model SpiritualPlanDay {
+  id                 String         @id @default(cuid())
+  spiritualPlanId    String
+  dayNumber          Int
+  title              String
+  verse              String
+  explanation        String
+  prayer             String
+  reflectionQuestion String
+  spiritualPlan      SpiritualPlan  @relation(fields: [spiritualPlanId], references: [id], onDelete: Cascade)
+
+  @@unique([spiritualPlanId, dayNumber])
+}
+
+model UserPlanProgress {
+  id         String         @id @default(cuid())
+  userId     String
+  planId     String
+  dayNumber  Int            @default(1)
+  completed  Boolean        @default(false)
+  startedAt  DateTime       @default(now())
+  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan       SpiritualPlan  @relation(fields: [planId], references: [id], onDelete: Cascade)
+}
+
+model FavoriteVerse {
+  id        String    @id @default(cuid())
+  userId    String
+  reference String
+  text      String
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PrayerRequest {
+  id             String              @id @default(cuid())
+  userId         String
+  content        String
+  anonymous      Boolean             @default(true)
+  status         String              @default("ACTIVE")
+  moderationNote String?
+  createdAt      DateTime            @default(now())
+  user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  supports       PrayerSupport[]
+}
+
+model PrayerSupport {
+  id              String        @id @default(cuid())
+  userId          String
+  prayerRequestId String
+  createdAt       DateTime      @default(now())
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  prayerRequest   PrayerRequest @relation(fields: [prayerRequestId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, prayerRequestId])
+  @@map("prayer_supports")
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  title     String
+  body      String
+  read      Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model GdprRequest {
+  id         String            @id @default(cuid())
+  userId     String
+  type       String
+  status     String            @default("PENDING")
+  createdAt  DateTime          @default(now())
+  user       User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
