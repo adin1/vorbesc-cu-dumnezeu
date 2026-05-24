@@ -11,13 +11,32 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const isProduction = configService.get<string>('NODE_ENV', 'development') === 'production';
   const frontendUrl = configService.get<string>('FRONTEND_URL', 'http://localhost:3000');
+  const allowedOrigins = frontendUrl
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
   const jwtSecret = configService.get<string>('JWT_SECRET', '');
 
   if (isProduction && (!jwtSecret || jwtSecret.includes('change-me'))) {
     throw new Error('JWT_SECRET este invalid pentru producție. Setează o valoare puternică.');
   }
 
-  app.enableCors({ origin: frontendUrl.split(',').map((item) => item.trim()), credentials: true });
+  app.enableCors({
+    origin: (origin, callback) => {
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+
+      if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error(`Origin not allowed by CORS: ${origin}`), false);
+    },
+    credentials: true,
+  });
   app.use(
     helmet({
       crossOriginResourcePolicy: false,
