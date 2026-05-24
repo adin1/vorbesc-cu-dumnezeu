@@ -14,7 +14,6 @@ const links = [
   { href: '/community', label: 'Comunitate' },
   { href: '/notifications', label: 'Notificari' },
   { href: '/profile', label: 'Profil' },
-  { href: '/admin', label: 'Admin' },
 ];
 
 export function AppNav() {

@@ -42,6 +42,8 @@ MVP spiritual creștin, fără API extern AI, cu ghid spiritual bazat pe date pr
 - Jurnal: `/journal`, `/journal/export`
 - Planuri: `/plans`, `/plans/:id`, `/plans/:id/start`, `/plans/progress/:id`
 - Comunitate: `/prayer-requests`, `/prayer-requests/:id/support`, `/prayer-requests/:id/report`
+- Moderare comunitate (admin): `/prayer-requests/moderation/pending`, `/prayer-requests/moderation/:id`
+- Analytics: `/analytics/acquisition`
 - Profil: `/profile`, `/profile/preferences`, `/profile/favorite-verses`, `/profile/saved-prayers`
 - Notificări: `/notifications`, `/notifications/:id/read`, `/notifications/read-all`
 - Admin: `/admin/metrics`
@@ -73,6 +75,8 @@ Setări producție:
 - `STRIPE_SECRET_KEY` -> cheie Stripe secret (backend)
 - `STRIPE_WEBHOOK_SECRET` -> secret webhook Stripe (backend)
 - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` -> cheie Stripe publică (frontend)
+- `NEXT_PUBLIC_PRIVACY_URL` -> URL pagină privacy
+- `NEXT_PUBLIC_TERMS_URL` -> URL pagină terms
 
 Ghid complet pas cu pas (Vercel + Railway):
 - vezi `DEPLOY.md`
@@ -182,6 +186,9 @@ Aplicatia include integrare catre un grup Facebook oficial, fara automatizari, s
 ### URL grup oficial
 - https://www.facebook.com/groups/vorbestecudumnezeu
 
+### URL aplicatie publica
+- https://vorbeste-cu-dumnezeu.vercel.app
+
 ### 1) Texte pregatite pentru Facebook
 
 Descriere scurta (max. 150 caractere):
@@ -219,6 +226,7 @@ Prima postare oficiala in grup:
 
 ```env
 NEXT_PUBLIC_FACEBOOK_GROUP_URL="https://www.facebook.com/groups/vorbestecudumnezeu"
+NEXT_PUBLIC_APP_PUBLIC_URL="https://vorbeste-cu-dumnezeu.vercel.app"
 ```
 
 4. Rulezi frontend-ul din nou (`npm run dev`) sau faci redeploy pentru productie.
@@ -226,7 +234,9 @@ NEXT_PUBLIC_FACEBOOK_GROUP_URL="https://www.facebook.com/groups/vorbestecudumnez
 ### 3) Cum functioneaza integrarea
 
 - Daca `NEXT_PUBLIC_FACEBOOK_GROUP_URL` este setat, aplicatia afiseaza butonul:
-   - Intra in grupul de rugaciune
+   - Intra in comunitate
+- Aplicatia afiseaza si butonul:
+   - Deschide aplicatia
 - Daca variabila nu este setata, aplicatia afiseaza:
    - Grupul Facebook va fi disponibil in curand.
 
@@ -235,17 +245,57 @@ Integrarea apare in:
 - Community
 - Profile
 
+Componenta folosita:
+- `apps/frontend/src/components/ui/FacebookCommunityCard.tsx`
+
+Pagina publica pentru comunitate:
+- `/comunitate`
+
 ### 4) Testare locala
 
 1. Setezi `NEXT_PUBLIC_FACEBOOK_GROUP_URL` in `.env`.
-2. Rulezi `npm run dev`.
-3. Verifici paginile `/home`, `/community`, `/profile`.
-4. Confirmi ca butonul deschide grupul `https://www.facebook.com/groups/vorbestecudumnezeu` in tab nou.
-5. Stergi temporar valoarea din `.env` si verifici mesajul fallback.
+2. Setezi `NEXT_PUBLIC_APP_PUBLIC_URL` in `.env`.
+3. Rulezi `npm run dev`.
+4. Verifici paginile `/home`, `/community`, `/profile`.
+5. Confirmi ca butonul `Intra in comunitate` deschide grupul `https://www.facebook.com/groups/vorbestecudumnezeu` in tab nou.
+6. Confirmi ca butonul `Deschide aplicatia` deschide `https://vorbeste-cu-dumnezeu.vercel.app`.
+7. Verifici pagina publica `/comunitate` si aceleasi 2 butoane.
+8. Stergi temporar valoarea din `NEXT_PUBLIC_FACEBOOK_GROUP_URL` si verifici mesajul fallback.
 
-### 5) Securitate si conformitate
+### 5) Calendar editorial si texte gata de postat
+
+Pentru activitate reala, legala si autentica in Facebook (fara boți, fara like-uri artificiale, fara comentarii false), foloseste fisierul:
+
+- `FACEBOOK_COMMUNITY_PLAN.md`
+
+Acesta include:
+- descriere grup
+- postare de bun venit
+- postare fixata (pinned)
+- reguli grup
+- mesaj pentru membri noi
+- 14 postari zilnice gata de publicare manuala
+- calendar editorial complet pe 14 zile
+
+### 6) Securitate si conformitate
 
 - Nu se salveaza date Facebook in baza de date.
 - Nu se foloseste scraping.
 - Nu se foloseste Facebook Login in aceasta etapa.
 - Integrarea este strict un link extern catre grupul oficial.
+
+## Disclaimer oficial
+
+Aplicația afișează pe ecranele principale următorul disclaimer:
+
+"Această aplicație oferă rugăciuni, versete și reflecții pentru sprijin spiritual. Nu înlocuiește ajutorul medical, psihologic, juridic sau pastoral."
+
+## Pregătire Google Play (PWA/TWA)
+
+- Manifest + Service Worker de bază în frontend
+- Pagini publice: `/privacy`, `/terms`
+- Asset-uri de publicare în `play-store-assets/`
+- Pentru TWA (Bubblewrap):
+   1. `npm i -g @bubblewrap/cli`
+   2. `bubblewrap init --manifest https://<domeniu-frontend>/manifest.webmanifest`
+   3. `bubblewrap build`

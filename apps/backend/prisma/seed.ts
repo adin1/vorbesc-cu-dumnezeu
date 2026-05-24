@@ -3,7 +3,132 @@ import * as bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
+type PrayerCategorySeed = {
+  name: string;
+  verse: string;
+  reference: string;
+  focus: string;
+  reflection: string;
+  titles: [string, string, string];
+};
+
+const prayerCategories: PrayerCategorySeed[] = [
+  {
+    name: 'Dimineață',
+    verse: 'Bunătățile Domnului nu s-au sfârșit, îndurările Lui nu sunt la capăt.',
+    reference: 'Plângerile lui Ieremia 3:22-23',
+    focus: 'începutul zilei cu pace și claritate',
+    reflection: 'Alege un pas mic de credință pentru ziua de azi.',
+    titles: ['Dimineață de încredințare', 'Rugăciune la început de zi', 'Doamne, condu-mi pașii de azi'],
+  },
+  {
+    name: 'Seară',
+    verse: 'În pace mă culc și adorm, căci numai Tu, Doamne, îmi dai liniște deplină.',
+    reference: 'Psalmul 4:8',
+    focus: 'odihna inimii după o zi grea',
+    reflection: 'Predă în rugăciune tot ce nu poți controla.',
+    titles: ['Rugăciune de seară pentru pace', 'Doamne, îți încredințez ziua', 'Odihnă în prezența Ta'],
+  },
+  {
+    name: 'Familie',
+    verse: 'Cât despre mine, eu și casa mea vom sluji Domnului.',
+    reference: 'Iosua 24:15',
+    focus: 'unitate, iertare și binecuvântare în familie',
+    reflection: 'Spune un cuvânt de pace în casa ta chiar azi.',
+    titles: ['Binecuvântare peste familie', 'Rugăciune pentru unitatea casei', 'Dragoste și pace în familie'],
+  },
+  {
+    name: 'Copii',
+    verse: 'Lăsați copiii să vină la Mine.',
+    reference: 'Marcu 10:14',
+    focus: 'protecție, creștere sănătoasă și lumină pentru copii',
+    reflection: 'Roagă-te pe nume pentru copiii pe care îi porți în inimă.',
+    titles: ['Rugăciune pentru copiii noștri', 'Doamne, păzește copiii', 'Creștere în lumină pentru copii'],
+  },
+  {
+    name: 'Iertare',
+    verse: 'Fiți buni unii cu alții, iertându-vă unul pe altul, cum v-a iertat și Dumnezeu.',
+    reference: 'Efeseni 4:32',
+    focus: 'vindecarea inimii prin iertare sinceră',
+    reflection: 'Fă un pas mic spre împăcare, chiar dacă e dificil.',
+    titles: ['Vindecare prin iertare', 'Rugăciune pentru inimă împăcată', 'Doamne, învață-mă să iert'],
+  },
+  {
+    name: 'Frică',
+    verse: 'Nu te teme, căci Eu sunt cu tine.',
+    reference: 'Isaia 41:10',
+    focus: 'curaj în fața neliniștii și a incertitudinii',
+    reflection: 'Amintește-ți că nu ești singur în încercare.',
+    titles: ['Când frica apasă', 'Doamne, dă-mi curaj', 'Rugăciune în vreme de teamă'],
+  },
+  {
+    name: 'Liniște',
+    verse: 'Opriți-vă și să știți că Eu sunt Dumnezeu.',
+    reference: 'Psalmul 46:10',
+    focus: 'așezarea sufletului în pacea lui Dumnezeu',
+    reflection: 'Păstrează câteva minute de tăcere în prezența Lui.',
+    titles: ['Liniște în prezența Ta', 'Doamne, oprește graba din mine', 'Pace pentru minte și inimă'],
+  },
+  {
+    name: 'Recunoștință',
+    verse: 'Mulțumiți lui Dumnezeu pentru toate lucrurile.',
+    reference: '1 Tesaloniceni 5:18',
+    focus: 'mulțumire pentru binele văzut și nevăzut',
+    reflection: 'Numește trei motive concrete de recunoștință.',
+    titles: ['Rugăciune de mulțumire', 'Doamne, îți mulțumesc', 'Inimă recunoscătoare'],
+  },
+  {
+    name: 'Decizii grele',
+    verse: 'Încrede-te în Domnul din toată inima ta.',
+    reference: 'Proverbe 3:5-6',
+    focus: 'înțelepciune și discernământ în alegeri importante',
+    reflection: 'Caută pacea înaintea grabei în decizie.',
+    titles: ['Înțelepciune pentru decizii', 'Doamne, luminează-mi alegerea', 'Rugăciune când nu știu ce să aleg'],
+  },
+  {
+    name: 'Sănătate',
+    verse: 'El vindecă pe cei cu inima zdrobită și le leagă rănile.',
+    reference: 'Psalmul 147:3',
+    focus: 'întărire în suferință și vindecare în trup și suflet',
+    reflection: 'Primește ajutorul potrivit și roagă-te cu speranță.',
+    titles: ['Rugăciune pentru sănătate', 'Doamne, atinge-mă cu vindecare', 'Întărire în boală'],
+  },
+  {
+    name: 'Nădejde',
+    verse: 'Cei ce se încred în Domnul își înnoiesc puterea.',
+    reference: 'Isaia 40:31',
+    focus: 'ridicare în vremuri de descurajare',
+    reflection: 'Privește spre viitor cu speranță, pas cu pas.',
+    titles: ['Nădejde pentru mâine', 'Rugăciune când e greu', 'Doamne, ridică-mi privirea'],
+  },
+  {
+    name: 'Protecție',
+    verse: 'Domnul te va păzi de orice rău, îți va păzi sufletul.',
+    reference: 'Psalmul 121:7',
+    focus: 'ocrotire pentru tine și cei dragi',
+    reflection: 'Încredințează-ți drumul în mâna lui Dumnezeu.',
+    titles: ['Rugăciune de protecție', 'Doamne, păzește-ne casa', 'Ocrotire în fiecare pas'],
+  },
+];
+
+function buildPrayerContent(focus: string, verse: string, reference: string, variation: number) {
+  const opening = [
+    'Doamne, vin înaintea Ta cu inimă deschisă și cu dorința sinceră de a rămâne aproape de Tine.',
+    'Doamne, în liniștea acestui moment îmi ridic sufletul către Tine și îți încredințez tot ce port în inimă.',
+    'Tată ceresc, mă apropii de Tine cu credință și cu nădejde, știind că Tu asculți rugăciunea copiilor Tăi.',
+  ][variation % 3];
+
+  const middle = [
+    `Te rog să-mi dăruiești ${focus}. Curăță-mi gândurile, întărește-mi pașii și ajută-mă să văd binele chiar și în zilele dificile.`,
+    `Așază peste mine harul Tău în ${focus}. Învață-mă să trăiesc cu blândețe, cu răbdare și cu încredere în planul Tău.`,
+    `Îți cer ajutor în ${focus}. Când sunt slăbit, ridică-mă; când mă tulbur, dă-mi pace; când mă tem, amintește-mi că ești cu mine.`,
+  ][variation % 3];
+
+  return `${opening}\n\n${middle}\n\nMă sprijin pe Cuvântul Tău: "${verse}" (${reference}). Fă ca adevărul acesta să coboare în inima mea și să-mi dea putere pentru ziua de azi. Îți mulțumesc pentru credincioșia Ta și pentru iubirea Ta care nu se schimbă. Amin.`;
+}
+
 async function main() {
+  await prisma.userAcquisition.deleteMany();
   await prisma.userSubscription.deleteMany();
   await prisma.donation.deleteMany();
   await prisma.subscriptionPlan.deleteMany();
@@ -26,13 +151,27 @@ async function main() {
   await prisma.user.deleteMany();
 
   const demoPasswordHash = await bcrypt.hash('Demo1234!', 10);
+  const adminPasswordHash = await bcrypt.hash('Admin1234!', 10);
   const helperPasswordHash = await bcrypt.hash('Parola123!', 10);
+
+  const adminUser = await prisma.user.create({
+    data: {
+      email: 'admin@vorbesc-cu-dumnezeu.ro',
+      passwordHash: adminPasswordHash,
+      name: 'Administrator VCD',
+      role: 'ADMIN',
+      denomination: 'GENERAL',
+      notifyDaily: true,
+      notifyCommunity: true,
+    },
+  });
 
   const demoUser = await prisma.user.create({
     data: {
       email: 'demo@vorbesc-cu-dumnezeu.ro',
       passwordHash: demoPasswordHash,
       name: 'Utilizator Demo',
+      role: 'USER',
       denomination: 'ORTHODOX',
       notifyDaily: true,
       notifyCommunity: true,
@@ -44,6 +183,7 @@ async function main() {
       email: 'sprijin@vorbesc-cu-dumnezeu.ro',
       passwordHash: helperPasswordHash,
       name: 'Echipa Sprijin',
+      role: 'USER',
       denomination: 'GENERAL',
     },
   });
@@ -89,13 +229,7 @@ async function main() {
       slug: 'gratuit',
       description: 'Accesul de bază pentru rugăciune, reflecție și comunitate.',
       priceMonthly: 0,
-      features: [
-        'Versetul zilei',
-        'Rugăciuni de bază',
-        'Jurnal simplu',
-        'Comunitate',
-        '3 planuri spirituale gratuite',
-      ],
+      features: ['Versetul zilei', 'Rugăciuni de bază', 'Jurnal simplu', 'Comunitate', '3 planuri spirituale gratuite'],
     },
     {
       name: 'Premium Basic',
@@ -138,143 +272,50 @@ async function main() {
     });
   }
 
-  const categories = [
-    'Dimineață',
-    'Seară',
-    'Familie',
-    'Copii',
-    'Iertare',
-    'Frică',
-    'Liniște',
-    'Recunoștință',
-    'Decizii grele',
-    'Sănătate',
-  ];
-
-  for (const name of categories) {
-    await prisma.prayerCategory.create({ data: { name } });
+  for (const category of prayerCategories) {
+    await prisma.prayerCategory.create({ data: { name: category.name } });
   }
 
   const catMap = await prisma.prayerCategory.findMany();
   const categoryByName = new Map(catMap.map((item) => [item.name, item.id]));
 
-  const prayers = [
-    {
-      title: 'Rugăciune pentru începutul zilei',
-      content:
-        'Doamne, îți mulțumesc pentru această dimineață. Pune lumină în gândurile mele și blândețe în cuvintele mele.',
-      category: 'Dimineață',
-    },
-    {
-      title: 'Rugăciune de seară pentru pace',
-      content:
-        'Doamne, îți încredințez tot ce n-am putut duce azi. Așază pacea Ta peste inima mea și peste casa mea.',
-      category: 'Seară',
-    },
-    {
-      title: 'Rugăciune pentru familie unită',
-      content:
-        'Doamne, binecuvântează familia mea cu răbdare, iertare și dragoste curată. Ajută-ne să ne purtăm unii pe alții cu grijă.',
-      category: 'Familie',
-    },
-    {
-      title: 'Rugăciune pentru copii păziți',
-      content:
-        'Doamne, păzește copiii noștri, luminează-le pașii și dă-le inimă curată, curaj și bucurie.',
-      category: 'Copii',
-    },
-    {
-      title: 'Rugăciune pentru iertare',
-      content:
-        'Doamne, vindecă locurile unde am rănit și unde am fost rănit. Dă-mi puterea să iert și să cer iertare cu smerenie.',
-      category: 'Iertare',
-    },
-    {
-      title: 'Rugăciune când apare frica',
-      content:
-        'Doamne, când inima mea se tulbură, amintește-mi că ești aproape. Înlocuiește frica mea cu încredere în Tine.',
-      category: 'Frică',
-    },
-    {
-      title: 'Rugăciune pentru liniște interioară',
-      content:
-        'Doamne, oprește graba din mine și învață-mă să respir în pacea Ta. Așază liniște în minte și odihnă în suflet.',
-      category: 'Liniște',
-    },
-    {
-      title: 'Rugăciune de recunoștință',
-      content:
-        'Doamne, îți mulțumesc pentru binele văzut și nevăzut. Dă-mi ochi să recunosc darurile Tale în fiecare zi.',
-      category: 'Recunoștință',
-    },
-    {
-      title: 'Rugăciune pentru decizii grele',
-      content:
-        'Doamne, când nu știu ce alegere să fac, dă-mi înțelepciune și pace. Închide ușile care nu sunt bune pentru mine.',
-      category: 'Decizii grele',
-    },
-    {
-      title: 'Rugăciune pentru sănătate',
-      content:
-        'Doamne, atinge trupul și sufletul meu cu vindecare. Întărește-mă în zilele grele și trimite oameni buni aproape.',
-      category: 'Sănătate',
-    },
-  ];
-
-  for (const prayer of prayers) {
-    const categoryId = categoryByName.get(prayer.category);
+  for (const category of prayerCategories) {
+    const categoryId = categoryByName.get(category.name);
     if (!categoryId) {
       continue;
     }
 
-    await prisma.prayer.create({
-      data: {
-        title: prayer.title,
-        content: prayer.content,
-        categoryId,
-      },
-    });
+    for (let i = 0; i < category.titles.length; i += 1) {
+      await prisma.prayer.create({
+        data: {
+          categoryId,
+          title: category.titles[i],
+          bibleVerse: category.verse,
+          bibleReference: category.reference,
+          shortReflection: category.reflection,
+          content: buildPrayerContent(category.focus, category.verse, category.reference, i),
+          isPremium: false,
+        },
+      });
+    }
   }
 
-  const verses = [
-    { reference: 'Psalmul 46:10', text: 'Opriți-vă și să știți că Eu sunt Dumnezeu.', topic: 'Liniște' },
-    {
-      reference: 'Filipeni 4:6-7',
-      text: 'Nu vă îngrijorați de nimic... iar pacea lui Dumnezeu vă va păzi inimile.',
-      topic: 'Recunoștință',
-    },
-    {
-      reference: 'Isaia 41:10',
-      text: 'Nu te teme, căci Eu sunt cu tine; nu te uita cu îngrijorare.',
-      topic: 'Curaj',
-    },
-    {
-      reference: 'Matei 11:28',
-      text: 'Veniți la Mine, toți cei trudiți și împovărați, și Eu vă voi da odihnă.',
-      topic: 'Oboseală',
-    },
-    {
-      reference: 'Efeseni 4:32',
-      text: 'Fiți buni unii cu alții... iertați-vă cum v-a iertat și Dumnezeu.',
-      topic: 'Iertare',
-    },
-    {
-      reference: 'Proverbe 3:5-6',
-      text: 'Încrede-te în Domnul din toată inima ta.',
-      topic: 'Decizii grele',
-    },
-  ];
+  const verses = prayerCategories.map((item) => ({
+    reference: item.reference,
+    text: item.verse,
+    topic: item.name,
+  }));
 
   await prisma.verse.createMany({ data: verses });
 
-  const encouragements = [
-    { topic: 'General', message: 'Un gând bun pentru tine: Dumnezeu nu te uită nici în zilele grele.' },
-    { topic: 'Liniște', message: 'Respiră adânc. Ești în grija lui Dumnezeu, pas cu pas.' },
-    { topic: 'Iertare', message: 'Vindecarea începe când alegi iertarea, chiar dacă e greu.' },
-    { topic: 'Recunoștință', message: 'Mulțumirea deschide inima spre pace.' },
-  ];
-
-  await prisma.encouragementMessage.createMany({ data: encouragements });
+  await prisma.encouragementMessage.createMany({
+    data: [
+      { topic: 'General', message: 'Un gând bun pentru tine: Dumnezeu nu te uită nici în zilele grele.' },
+      { topic: 'Liniște', message: 'Respiră adânc. Ești în grija lui Dumnezeu, pas cu pas.' },
+      { topic: 'Iertare', message: 'Vindecarea începe când alegi iertarea, chiar dacă e greu.' },
+      { topic: 'Recunoștință', message: 'Mulțumirea deschide inima spre pace.' },
+    ],
+  });
 
   const moods = [
     {
@@ -294,52 +335,12 @@ async function main() {
       reflectionQuestion: 'Ce povară ai putea lăsa azi, în rugăciune, înaintea lui Dumnezeu?',
     },
     {
-      slug: 'trist',
-      name: 'Mă simt trist/ă',
-      warmMessage: 'Un gând bun pentru tine: chiar și în tristețe, Dumnezeu rămâne aproape.',
-      verse: 'Psalmul 34:18 - Domnul este aproape de cei cu inima înfrântă.',
-      shortPrayer: 'Doamne, mângâie-mi sufletul și dă-mi speranță nouă.',
-      reflectionQuestion: 'Ce persoană de încredere poți chema azi aproape de tine?',
-    },
-    {
-      slug: 'recunoscator',
-      name: 'Mă simt recunoscător/recunoscătoare',
-      warmMessage: 'Un gând bun pentru tine: mulțumirea păstrează inima vie și plină de lumină.',
-      verse: '1 Tesaloniceni 5:18 - Mulțumiți lui Dumnezeu pentru toate lucrurile.',
-      shortPrayer: 'Doamne, îți mulțumesc pentru bunătatea Ta din viața mea.',
-      reflectionQuestion: 'Care sunt cele trei daruri pentru care vrei să-I mulțumești azi?',
-    },
-    {
       slug: 'ingrijorat',
       name: 'Mă simt îngrijorat/ă',
       warmMessage: 'Un gând bun pentru tine: Dumnezeu vede îngrijorarea ta și merge cu tine.',
       verse: 'Filipeni 4:6 - Nu vă îngrijorați de nimic, ci aduceți cererile voastre la Dumnezeu.',
       shortPrayer: 'Doamne, înlocuiește îngrijorarea mea cu pacea Ta.',
       reflectionQuestion: 'Ce grijă concretă poți transforma azi într-o rugăciune simplă?',
-    },
-    {
-      slug: 'curaj',
-      name: 'Am nevoie de curaj',
-      warmMessage: 'Un gând bun pentru tine: curajul crește când alegi să faci următorul pas mic.',
-      verse: 'Iosua 1:9 - Fii tare și curajos! Domnul este cu tine.',
-      shortPrayer: 'Doamne, dă-mi curaj să merg înainte cu încredere.',
-      reflectionQuestion: 'Care este pasul mic de curaj pe care îl poți face chiar azi?',
-    },
-    {
-      slug: 'iertare',
-      name: 'Am nevoie de iertare',
-      warmMessage: 'Un gând bun pentru tine: iertarea vindecă inima, chiar dacă procesul este greu.',
-      verse: 'Coloseni 3:13 - Iertați-vă unul pe altul, cum v-a iertat Hristos.',
-      shortPrayer: 'Doamne, învață-mă să iert și să primesc iertarea Ta cu smerenie.',
-      reflectionQuestion: 'Ce conversație sinceră te-ar ajuta să faci un pas spre iertare?',
-    },
-    {
-      slug: 'rabdare',
-      name: 'Am nevoie de răbdare',
-      warmMessage: 'Un gând bun pentru tine: răbdarea este un drum, nu o performanță de o zi.',
-      verse: 'Romani 12:12 - Bucurați-vă în nădejde. Fiți răbdători în necaz.',
-      shortPrayer: 'Doamne, pune în mine blândețe și răbdare când lucrurile nu merg cum vreau.',
-      reflectionQuestion: 'În ce relație ai nevoie azi de mai multă blândețe?',
     },
   ];
 
@@ -363,36 +364,39 @@ async function main() {
   }
 
   const plans = [
-    { title: '7 zile pentru liniște', days: 7, isPremium: false, premiumTier: null },
-    { title: '7 zile pentru iertare', days: 7, isPremium: false, premiumTier: null },
-    { title: '7 zile de recunoștință', days: 7, isPremium: false, premiumTier: null },
-    { title: '14 zile pentru vindecare sufletească', days: 14, isPremium: true, premiumTier: 'PREMIUM_BASIC' },
-    { title: '30 zile cu Psalmii', days: 30, isPremium: true, premiumTier: 'PREMIUM_BASIC' },
-    { title: '7 zile pentru mame', days: 7, isPremium: true, premiumTier: 'PREMIUM_FAMILY' },
-    { title: '7 zile pentru adolescenți', days: 7, isPremium: true, premiumTier: 'PREMIUM_FAMILY' },
+    { title: '7 zile pentru liniște', days: 7, premiumTier: null, descriptionTag: 'Liniște' },
+    { title: '7 zile pentru iertare', days: 7, premiumTier: null, descriptionTag: 'Iertare' },
+    { title: '7 zile de recunoștință', days: 7, premiumTier: null, descriptionTag: 'Recunoștință' },
+    { title: '14 zile pentru vindecare sufletească', days: 14, premiumTier: 'PREMIUM_BASIC', descriptionTag: 'Vindecare sufletească' },
+    { title: '30 zile cu Psalmii', days: 30, premiumTier: 'PREMIUM_BASIC', descriptionTag: 'Psalmi' },
+    { title: '7 zile pentru mame', days: 7, premiumTier: 'PREMIUM_FAMILY', descriptionTag: 'Mame' },
+    { title: '7 zile pentru adolescenți', days: 7, premiumTier: 'PREMIUM_FAMILY', descriptionTag: 'Adolescenți' },
+    { title: '7 zile pentru curaj', days: 7, premiumTier: null, descriptionTag: 'Curaj' },
+    { title: '7 zile pentru decizii grele', days: 7, premiumTier: null, descriptionTag: 'Decizii grele' },
   ];
 
   for (const plan of plans) {
     const createdPlan = await prisma.spiritualPlan.create({
       data: {
         title: plan.title,
-        description: `Plan ghidat: ${plan.title}`,
+        description: `Plan ghidat pentru ${plan.descriptionTag}. Potrivit pentru cei care doresc pași clari, zilnici și practici.`,
         durationDays: plan.days,
-        isPremium: plan.isPremium,
+        isPremium: Boolean(plan.premiumTier),
         premiumTier: plan.premiumTier,
       },
     });
 
-    for (let day = 1; day <= plan.days; day++) {
+    for (let day = 1; day <= plan.days; day += 1) {
+      const verse = verses[day % verses.length];
       await prisma.spiritualPlanDay.create({
         data: {
           spiritualPlanId: createdPlan.id,
           dayNumber: day,
-          title: `Ziua ${day} - ${plan.title}`,
-          verse: verses[day % verses.length].reference,
-          explanation: 'Azi fă un pas mic cu Dumnezeu: rugăciune scurtă, un verset și un moment de liniște.',
-          prayer: 'Doamne, condu-mi pașii și păstrează-mi inima aproape de Tine în această zi.',
-          reflectionQuestion: 'Ce pot trăi azi, concret, din ce am citit?',
+          title: `Ziua ${day} - ${plan.descriptionTag}`,
+          verse: `${verse.reference} - ${verse.text}`,
+          explanation: 'Azi fă un pas simplu: citește versetul, rostește rugăciunea și notează o decizie concretă.',
+          prayer: 'Doamne, călăuzește-mi pașii de azi, dă-mi răbdare și păstrează-mi inima aproape de Tine.',
+          reflectionQuestion: 'Ce pas concret de credință aleg să fac astăzi?',
         },
       });
     }
@@ -413,16 +417,20 @@ async function main() {
       userId: demoUser.id,
       content: 'Vă rog să vă rugați pentru sănătatea mamei mele.',
       anonymous: true,
-      status: 'ACTIVE',
+      shareTarget: 'APP_ONLY',
+      facebookShareText: 'Bună! Am o cerere de rugăciune: Vă rog să vă rugați pentru sănătatea mamei mele. Mulțumesc celor care se roagă pentru mine.',
+      status: 'APPROVED',
     },
   });
 
   await prisma.prayerRequest.create({
     data: {
       userId: helperUser.id,
-      content: 'Rugăciune pentru pace în familie.',
+      content: 'Rugăciune pentru pace în familie și înțelepciune în dialog.',
       anonymous: false,
-      status: 'ACTIVE',
+      shareTarget: 'FACEBOOK_PREP',
+      facebookShareText: 'Bună! Am o cerere de rugăciune: Rugăciune pentru pace în familie și înțelepciune în dialog. Mulțumesc celor care se roagă pentru mine.',
+      status: 'PENDING',
     },
   });
 
@@ -446,20 +454,14 @@ async function main() {
         body: 'Filipeni 4:6-7 - adu îngrijorările tale înaintea lui Dumnezeu.',
       },
       {
-        userId: helperUser.id,
-        title: 'Cerere nouă în comunitate',
-        body: 'Cineva a postat o nouă cerere de rugăciune. Intră și oferă sprijin.',
-      },
-      {
-        userId: demoUser.id,
-        title: 'Sprijin pentru comunitate',
-        body: 'Dacă aplicația îți este de folos, poți susține dezvoltarea ei printr-o donație sau un plan premium.',
+        userId: adminUser.id,
+        title: 'Moderare comunitate',
+        body: 'Ai cereri noi care așteaptă aprobare în zona Admin.',
       },
     ],
   });
 
   const premiumBasicPlan = await prisma.subscriptionPlan.findUnique({ where: { slug: 'premium-basic' } });
-
   if (premiumBasicPlan) {
     await prisma.userSubscription.create({
       data: {
@@ -483,6 +485,28 @@ async function main() {
     },
   });
 
+  await prisma.userAcquisition.createMany({
+    data: [
+      {
+        userId: demoUser.id,
+        source: 'facebook',
+        medium: 'group',
+        campaign: 'comunitate',
+        landingPage: '/',
+        referrer: 'https://www.facebook.com/groups/vorbestecudumnezeu',
+        firstVisitAt: new Date(),
+      },
+      {
+        source: 'facebook',
+        medium: 'group',
+        campaign: 'comunitate',
+        landingPage: '/comunitate',
+        referrer: 'https://www.facebook.com/groups/vorbestecudumnezeu',
+        firstVisitAt: new Date(),
+      },
+    ],
+  });
+
   await prisma.favoriteVerse.create({
     data: {
       userId: demoUser.id,
@@ -491,20 +515,7 @@ async function main() {
     },
   });
 
-  const linisteCategoryId = categoryByName.get('Liniște');
-  if (linisteCategoryId) {
-    await prisma.prayer.create({
-      data: {
-        userId: demoUser.id,
-        categoryId: linisteCategoryId,
-        title: 'Rugăciunea mea de liniște',
-        content: 'Doamne, așază pacea Ta în casa și inima mea.',
-        isGenerated: false,
-      },
-    });
-  }
-
-  console.log('Seed complet: date reale pentru MVP încărcate cu succes.');
+  console.log('Seed complet: roluri, rugăciuni biblice extinse, planuri și comunitate actualizate.');
 }
 
 main()

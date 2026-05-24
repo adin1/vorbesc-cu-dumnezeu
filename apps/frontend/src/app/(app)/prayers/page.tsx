@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { Disclaimer } from '@/components/ui/Disclaimer';
 import { PremiumFeatureCard } from '@/components/ui/PremiumFeatureCard';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import {
@@ -240,6 +241,7 @@ export default function PrayersPage() {
         )}
       </Card>
       {status ? <p className="muted">{status}</p> : null}
+      <Disclaimer />
     </div>
   );
 }

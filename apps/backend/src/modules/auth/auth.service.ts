@@ -25,9 +25,26 @@ export class AuthService {
         email: dto.email,
         passwordHash,
         name: dto.name,
+        role: 'USER',
         denomination: dto.denomination ?? 'GENERAL',
       },
     });
+
+    if (dto.acquisition?.source) {
+      await this.prisma.userAcquisition.create({
+        data: {
+          userId: user.id,
+          source: dto.acquisition.source,
+          medium: dto.acquisition.medium,
+          campaign: dto.acquisition.campaign,
+          landingPage: dto.acquisition.landingPage,
+          referrer: dto.acquisition.referrer,
+          firstVisitAt: dto.acquisition.firstVisitAt
+            ? new Date(dto.acquisition.firstVisitAt)
+            : new Date(),
+        },
+      });
+    }
 
     await this.prisma.notification.create({
       data: {
@@ -39,7 +56,7 @@ export class AuthService {
 
     this.dashboardCache.invalidateUser(user.id);
 
-    const token = await this.signToken(user.id, user.email);
+    const token = await this.signToken(user.id, user.email, user.role);
     return { token, user: this.sanitizeUser(user) };
   }
 
@@ -54,7 +71,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const token = await this.signToken(user.id, user.email);
+    const token = await this.signToken(user.id, user.email, user.role);
     return { token, user: this.sanitizeUser(user) };
   }
 
@@ -67,8 +84,8 @@ export class AuthService {
     return this.sanitizeUser(user);
   }
 
-  private async signToken(userId: string, email: string) {
-    return this.jwtService.signAsync({ sub: userId, email });
+  private async signToken(userId: string, email: string, role: string) {
+    return this.jwtService.signAsync({ sub: userId, email, role });
   }
 
   private sanitizeUser(user: { passwordHash: string } & Record<string, unknown>) {

@@ -12,6 +12,7 @@ model User {
   email             String               @unique
   passwordHash      String
   name              String
+  role              String               @default("USER")
   denomination      String               @default("GENERAL")
   dailyStreak       Int                  @default(0)
   notifyDaily       Boolean              @default(true)
@@ -30,6 +31,7 @@ model User {
   gdprRequests      GdprRequest[]
   subscriptions     UserSubscription[]
   donations         Donation[]
+  acquisitions      UserAcquisition[]
 }
 
 model SpiritualMood {
@@ -110,8 +112,12 @@ model Prayer {
   userId      String?
   categoryId  String
   title       String
+  bibleVerse  String?
+  bibleReference String?
+  shortReflection String?
   content     String
   isGenerated Boolean         @default(false)
+  isPremium   Boolean         @default(false)
   createdAt   DateTime        @default(now())
   user        User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
   category    PrayerCategory  @relation(fields: [categoryId], references: [id])
@@ -182,7 +188,9 @@ model PrayerRequest {
   userId         String
   content        String
   anonymous      Boolean             @default(true)
-  status         String              @default("ACTIVE")
+  shareTarget    String              @default("APP_ONLY")
+  facebookShareText String?
+  status         String              @default("PENDING")
   moderationNote String?
   createdAt      DateTime            @default(now())
   user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -269,4 +277,20 @@ model PremiumFeature {
   slug        String   @unique
   description String
   createdAt   DateTime @default(now())
+}
+
+model UserAcquisition {
+  id          String   @id @default(cuid())
+  userId      String?
+  source      String
+  medium      String?
+  campaign    String?
+  landingPage String?
+  referrer    String?
+  firstVisitAt DateTime
+  createdAt   DateTime @default(now())
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([source, createdAt])
+  @@index([userId])
 }

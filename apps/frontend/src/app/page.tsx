@@ -1,12 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { login, register } from '@/lib/api-client';
+import { login, postAcquisition, register } from '@/lib/api-client';
 import { setToken } from '@/lib/auth-token';
 import { Disclaimer } from '@/components/ui/Disclaimer';
 import { Button } from '@/components/ui/Button';
+
+const ACQUISITION_KEY = 'first_acquisition_payload';
 
 export default function LandingPage() {
   const router = useRouter();
@@ -16,6 +18,31 @@ export default function LandingPage() {
   const [password, setPassword] = useState('');
   const [status, setStatus] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const existing = localStorage.getItem(ACQUISITION_KEY);
+    if (existing) {
+      return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const source = (params.get('utm_source') || '').toLowerCase() || 'direct';
+    const payload = {
+      source,
+      medium: params.get('utm_medium') || undefined,
+      campaign: params.get('utm_campaign') || undefined,
+      landingPage: window.location.pathname,
+      referrer: document.referrer || undefined,
+      firstVisitAt: new Date().toISOString(),
+    };
+
+    localStorage.setItem(ACQUISITION_KEY, JSON.stringify(payload));
+    postAcquisition(payload).catch(() => undefined);
+  }, []);
 
   const getFriendlyError = (message: string) => {
     if (message.includes('Invalid credentials')) {
@@ -37,7 +64,16 @@ export default function LandingPage() {
     try {
       const response =
         mode === 'register'
-          ? await register({ email, password, name, denomination: 'GENERAL' })
+          ? await register({
+              email,
+              password,
+              name,
+              denomination: 'GENERAL',
+              acquisition:
+                typeof window !== 'undefined'
+                  ? JSON.parse(localStorage.getItem(ACQUISITION_KEY) || 'null') || undefined
+                  : undefined,
+            })
           : await login({ email, password });
 
       setToken(response.token);
@@ -128,6 +164,9 @@ export default function LandingPage() {
       </section>
 
       <Disclaimer />
+      <p className="muted" style={{ marginTop: -8 }}>
+        <Link href="/privacy">Politica de confidențialitate</Link> • <Link href="/terms">Termeni și condiții</Link>
+      </p>
     </main>
   );
 }

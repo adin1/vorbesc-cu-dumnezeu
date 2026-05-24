@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { FacebookGroupCard } from '@/components/ui/FacebookGroupCard';
+import { Disclaimer } from '@/components/ui/Disclaimer';
+import { FacebookCommunityCard } from '@/components/ui/FacebookCommunityCard';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import {
   clearDashboardCache,
@@ -197,6 +198,7 @@ export default function HomePage() {
           </p>
         ) : null}
       </Card>
+        <Disclaimer />
       <Card>
         <h3>Tablou spiritual</h3>
         {stats ? (
@@ -297,7 +299,7 @@ export default function HomePage() {
           </div>
         )}
       </Card>
-      <FacebookGroupCard />
+      <FacebookCommunityCard />
       <Card>
         <h3>Recomandarea spirituală a zilei</h3>
         {recommendation ? (

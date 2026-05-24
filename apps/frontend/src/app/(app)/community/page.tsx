@@ -1,12 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { FacebookGroupCard } from '@/components/ui/FacebookGroupCard';
+import { Disclaimer } from '@/components/ui/Disclaimer';
+import { FacebookCommunityCard } from '@/components/ui/FacebookCommunityCard';
+import { PrayerRequestCard } from '@/components/ui/PrayerRequestCard';
+import { PrayerRequestForm } from '@/components/ui/PrayerRequestForm';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import {
-  createPrayerRequest,
+  createPrayerRequestWithMode,
   getPrayerRequests,
   reportPrayerRequest,
   supportPrayerRequest,
@@ -16,8 +18,8 @@ import { getToken } from '@/lib/auth-token';
 
 export default function CommunityPage() {
   const [requests, setRequests] = useState<PrayerRequest[]>([]);
-  const [content, setContent] = useState('');
   const [status, setStatus] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const loadRequests = async () => {
     const token = getToken();
@@ -32,8 +34,11 @@ export default function CommunityPage() {
     loadRequests();
   }, []);
 
-  const handleCreate = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleCreate = async (payload: {
+    content: string;
+    anonymous: boolean;
+    publishMode: 'APP_ONLY' | 'FACEBOOK_PREP';
+  }) => {
     const token = getToken();
     if (!token) {
       setStatus('Autentificarea este necesara.');
@@ -41,13 +46,15 @@ export default function CommunityPage() {
     }
 
     try {
-      await createPrayerRequest(token, { content, anonymous: true });
-      setContent('');
-      setStatus('Cererea de rugaciune a fost publicata.');
+      setSubmitting(true);
+      await createPrayerRequestWithMode(token, payload);
+      setStatus('Cererea de rugaciune a fost trimisa spre moderare.');
       await loadRequests();
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Eroare necunoscuta';
       setStatus(`Eroare: ${message}`);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -95,58 +102,22 @@ export default function CommunityPage() {
         </p>
         <p className="muted" style={{ marginTop: 0 }}>Matei 18:20</p>
       </Card>
-      <FacebookGroupCard
-        title="Vorbeste cu Dumnezeu - Comunitate de rugaciune si sprijin"
-        description="Intra in grupul oficial pentru cereri de rugaciune, versete zilnice, incurajare si reflexie in pace."
-      />
-      {process.env.NEXT_PUBLIC_FACEBOOK_GROUP_URL ? (
-        <Card>
-          <h3>Acces rapid catre grup</h3>
-          <a
-            className="button facebook-group-button facebook-group-button-large"
-            href={process.env.NEXT_PUBLIC_FACEBOOK_GROUP_URL}
-            target="_blank"
-            rel="noreferrer noopener"
-          >
-            Intra in grupul de rugaciune
-          </a>
-        </Card>
-      ) : null}
+      <FacebookCommunityCard />
       <Card>
-        <h3>Publica o cerere de rugaciune</h3>
-        <form className="form-grid" onSubmit={handleCreate}>
-          <label>
-            Cererea ta (anonim)
-            <textarea
-              rows={4}
-              value={content}
-              onChange={(event) => setContent(event.target.value)}
-              minLength={3}
-              required
-            />
-          </label>
-          <Button type="submit">Publica cererea</Button>
-        </form>
+        <h3>Trimite o cerere de rugaciune</h3>
+        <PrayerRequestForm loading={submitting} onSubmit={handleCreate} />
       </Card>
       <Card>
-        <h3>Cereri din API</h3>
+        <h3>Cereri aprobate</h3>
         {requests.length ? (
           <ul>
             {requests.slice(0, 8).map((request) => (
-              <li key={request.id} style={{ marginBottom: 12 }}>
-                <div>{request.content}</div>
-                <div className="muted">
-                  {request.supports.length} sustineri | status: {request.status}
-                </div>
-                <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-                  <Button type="button" variant="secondary" onClick={() => handleSupport(request.id)}>
-                    Ma rog pentru tine
-                  </Button>
-                  <Button type="button" variant="secondary" onClick={() => handleReport(request.id)}>
-                    Raporteaza
-                  </Button>
-                </div>
-              </li>
+              <PrayerRequestCard
+                key={request.id}
+                request={request}
+                onSupport={handleSupport}
+                onReport={handleReport}
+              />
             ))}
           </ul>
         ) : (
@@ -154,6 +125,7 @@ export default function CommunityPage() {
         )}
       </Card>
       {status ? <p className="muted">{status}</p> : null}
+      <Disclaimer />
     </div>
   );
 }

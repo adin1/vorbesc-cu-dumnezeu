@@ -1,5 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import { MonetizationService } from '../monetization/monetization.service';
 
@@ -7,14 +6,12 @@ import { MonetizationService } from '../monetization/monetization.service';
 export class AdminService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly configService: ConfigService,
     private readonly monetizationService: MonetizationService,
   ) {}
 
-  async metrics(userEmail: string) {
-    this.assertAdmin(userEmail);
-
-    const [users, prayers, journalEntries, prayerRequests, activePlanRows, monetization] = await Promise.all([
+  async metrics() {
+    const [users, prayers, journalEntries, prayerRequests, activePlanRows, monetization, acquisitionRows] =
+      await Promise.all([
       this.prisma.user.count(),
       this.prisma.prayer.count({ where: { userId: null } }),
       this.prisma.journalEntry.count(),
@@ -25,6 +22,25 @@ export class AdminService {
         select: { planId: true },
       }),
       this.monetizationService.getAdminMonetizationMetrics(),
+      this.prisma.userAcquisition.findMany({
+        where: { source: 'facebook' },
+        select: { userId: true },
+      }),
+    ]);
+
+    const facebookVisitors = acquisitionRows.length;
+    const registeredSet = new Set(acquisitionRows.map((row) => row.userId).filter(Boolean));
+    const facebookRegisteredUsers = registeredSet.size;
+
+    const [planStartsRows, prayerPostRows] = await Promise.all([
+      this.prisma.userPlanProgress.findMany({
+        where: { userId: { in: Array.from(registeredSet) as string[] } },
+        select: { userId: true },
+      }),
+      this.prisma.prayerRequest.findMany({
+        where: { userId: { in: Array.from(registeredSet) as string[] } },
+        select: { userId: true },
+      }),
     ]);
 
     return {
@@ -38,14 +54,11 @@ export class AdminService {
       estimatedMonthlyRevenue: monetization.estimatedMonthlyRevenue,
       premiumUsers: monetization.premiumUsers,
       activeMonetizationPlans: monetization.activePlans,
+      facebookVisitors,
+      facebookRegisteredUsers,
+      facebookUsersStartedPlan: new Set(planStartsRows.map((row) => row.userId)).size,
+      facebookUsersPostedPrayerRequest: new Set(prayerPostRows.map((row) => row.userId)).size,
       refreshedAt: new Date().toISOString(),
     };
-  }
-
-  private assertAdmin(userEmail: string) {
-    const adminEmail = this.configService.get<string>('DASHBOARD_CACHE_ADMIN_EMAIL', '');
-    if (!adminEmail || userEmail.toLowerCase() !== adminEmail.toLowerCase()) {
-      throw new ForbiddenException('Nu ai permisiunea pentru zona de administrare.');
-    }
   }
 }

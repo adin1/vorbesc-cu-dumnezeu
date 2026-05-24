@@ -49,6 +49,7 @@ export type AuthResponse = {
     id: string;
     email: string;
     name: string;
+    role: 'USER' | 'ADMIN';
     denomination: string;
   };
 };
@@ -98,6 +99,10 @@ export type AdminMetricsResponse = {
     name: string;
     subscribers: number;
   }>;
+  facebookVisitors: number;
+  facebookRegisteredUsers: number;
+  facebookUsersStartedPlan: number;
+  facebookUsersPostedPrayerRequest: number;
   refreshedAt: string;
 };
 
@@ -192,7 +197,10 @@ export type PrayerRequest = {
   content: string;
   anonymous: boolean;
   status: string;
+  shareTarget?: string;
+  facebookShareText?: string;
   supports: Array<{ id: string }>;
+  createdAt?: string;
 };
 
 export type JournalEntry = {
@@ -230,6 +238,7 @@ export type ProfileResponse = {
   id: string;
   email: string;
   name: string;
+  role: 'USER' | 'ADMIN';
   denomination: string;
   dailyStreak: number;
   notifyDaily: boolean;
@@ -347,6 +356,14 @@ export function register(payload: {
   password: string;
   name: string;
   denomination: string;
+  acquisition?: {
+    source?: string;
+    medium?: string;
+    campaign?: string;
+    landingPage?: string;
+    referrer?: string;
+    firstVisitAt?: string;
+  };
 }) {
   return request<AuthResponse>('/auth/register', 'POST', payload);
 }
@@ -430,11 +447,30 @@ export function getPlans(token: string) {
   return request<SpiritualPlan[]>('/plans', 'GET', undefined, token);
 }
 
+export function getPlanById(token: string, planId: string) {
+  return request<SpiritualPlan & { days: Array<{
+    id: string;
+    dayNumber: number;
+    title: string;
+    verse: string;
+    explanation: string;
+    prayer: string;
+    reflectionQuestion: string;
+  }> }>(`/plans/${planId}`, 'GET', undefined, token);
+}
+
 export function getPrayerRequests(token: string) {
   return request<PrayerRequest[]>('/prayer-requests', 'GET', undefined, token);
 }
 
 export function createPrayerRequest(token: string, payload: { content: string; anonymous?: boolean }) {
+  return request<PrayerRequest>('/prayer-requests', 'POST', payload, token);
+}
+
+export function createPrayerRequestWithMode(
+  token: string,
+  payload: { content: string; anonymous?: boolean; publishMode?: 'APP_ONLY' | 'FACEBOOK_PREP' },
+) {
   return request<PrayerRequest>('/prayer-requests', 'POST', payload, token);
 }
 
@@ -444,6 +480,35 @@ export function supportPrayerRequest(token: string, prayerRequestId: string) {
 
 export function reportPrayerRequest(token: string, prayerRequestId: string, reason: string) {
   return request<PrayerRequest>(`/prayer-requests/${prayerRequestId}/report`, 'POST', { reason }, token);
+}
+
+export function getPendingPrayerRequests(token: string) {
+  return request<Array<PrayerRequest & { user?: { id: string; email: string; name: string } }>>(
+    '/prayer-requests/moderation/pending',
+    'GET',
+    undefined,
+    token,
+  );
+}
+
+export function moderatePrayerRequest(
+  token: string,
+  prayerRequestId: string,
+  payload: { status: 'APPROVED' | 'REJECTED'; moderationNote?: string },
+) {
+  return request<PrayerRequest>(`/prayer-requests/moderation/${prayerRequestId}`, 'PATCH', payload, token);
+}
+
+export function postAcquisition(payload: {
+  source: string;
+  medium?: string;
+  campaign?: string;
+  landingPage?: string;
+  referrer?: string;
+  firstVisitAt?: string;
+  userId?: string;
+}) {
+  return request<{ id: string }>('/analytics/acquisition', 'POST', payload);
 }
 
 export function getJournalEntries(token: string) {

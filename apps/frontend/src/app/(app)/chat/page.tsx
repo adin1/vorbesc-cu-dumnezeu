@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { Disclaimer } from '@/components/ui/Disclaimer';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import {
   getSpiritualMoods,
@@ -113,6 +114,7 @@ export default function ChatPage() {
           </p>
         </Card>
       ) : null}
+      <Disclaimer />
     </div>
   );
 }
