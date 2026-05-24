@@ -27,6 +27,19 @@ type ParsedSubscriptionPlan = {
   createdAt: Date;
 };
 
+type AdminMonetizationMetrics = {
+  totalDonations: number;
+  totalSubscriptions: number;
+  estimatedMonthlyRevenue: number;
+  premiumUsers: number;
+  activePlans: number;
+  activePlanBreakdown: Array<{
+    slug: string;
+    name: string;
+    subscribers: number;
+  }>;
+};
+
 const FEATURE_TO_PLAN: Record<string, 'gratuit' | 'premium-basic' | 'premium-family'> = {
   'audio-prayers': 'premium-basic',
   'pdf-export': 'premium-basic',
@@ -285,7 +298,7 @@ export class MonetizationService {
     const webhookSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET', '');
 
     if (!webhookSecret) {
-      throw new BadRequestException('Webhook-ul Stripe nu este configurat.');
+      throw new BadRequestException('STRIPE_WEBHOOK_SECRET lipsește');
     }
 
     if (!rawBody || !signature || Array.isArray(signature)) {
@@ -298,9 +311,13 @@ export class MonetizationService {
       case 'checkout.session.completed':
         await this.handleCheckoutCompleted(event.data.object as Stripe.Checkout.Session);
         break;
+      case 'customer.subscription.created':
       case 'customer.subscription.updated':
       case 'customer.subscription.deleted':
         await this.handleSubscriptionUpdated(event.data.object as Stripe.Subscription);
+        break;
+      case 'payment_intent.succeeded':
+        await this.handlePaymentIntentSucceeded(event.data.object as Stripe.PaymentIntent);
         break;
       case 'invoice.payment_failed':
         await this.handleInvoiceFailed(event.data.object as Stripe.Invoice);
@@ -375,7 +392,7 @@ export class MonetizationService {
     return plan;
   }
 
-  async getAdminMonetizationMetrics() {
+  async getAdminMonetizationMetrics(): Promise<AdminMonetizationMetrics> {
     const [donations, subscriptions, activeSubscriptions, plans] = await Promise.all([
       this.prisma.donation.findMany(),
       this.prisma.userSubscription.findMany({ include: { plan: true } }),
@@ -388,7 +405,7 @@ export class MonetizationService {
 
     const totalDonations = donations.reduce((sum, item) => sum + item.amount, 0);
     const estimatedMonthlyRevenue = activeSubscriptions.reduce((sum, item) => sum + item.plan.priceMonthly, 0);
-    const activePlans = plans.map((plan) => ({
+    const activePlanBreakdown = plans.map((plan) => ({
       slug: plan.slug,
       name: plan.name,
       subscribers: activeSubscriptions.filter((item) => item.planId === plan.id).length,
@@ -399,15 +416,14 @@ export class MonetizationService {
       totalSubscriptions: subscriptions.length,
       estimatedMonthlyRevenue,
       premiumUsers: new Set(activeSubscriptions.map((item) => item.userId)).size,
-      activePlans,
+      activePlans: plans.length,
+      activePlanBreakdown,
     };
   }
 
   private getStripe() {
     if (!this.stripe) {
-      throw new BadRequestException(
-        'Plățile nu sunt configurate încă. Adaugă cheile Stripe înainte de a activa checkout-ul.',
-      );
+      throw new BadRequestException('STRIPE_SECRET_KEY lipsește');
     }
 
     return this.stripe;
@@ -590,5 +606,9 @@ export class MonetizationService {
         expiresAt: invoice.period_end ? new Date(invoice.period_end * 1000) : record.expiresAt,
       },
     });
+  }
+
+  private async handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent) {
+    this.logger.debug(`Payment intent succeeded: ${paymentIntent.id}`);
   }
 }

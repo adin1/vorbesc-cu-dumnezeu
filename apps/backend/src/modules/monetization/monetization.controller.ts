@@ -35,9 +35,24 @@ export class MonetizationController {
     return this.monetizationService.createSubscriptionCheckoutSession(user.id, dto);
   }
 
+  @Post('create-checkout-session')
+  @UseGuards(JwtAuthGuard)
+  createCheckoutSessionAlias(
+    @CurrentUser() user: { id: string },
+    @Body() dto: CreateSubscriptionCheckoutDto,
+  ) {
+    return this.monetizationService.createSubscriptionCheckoutSession(user.id, dto);
+  }
+
   @Post('checkout/donation')
   @UseGuards(JwtAuthGuard)
   createDonationCheckout(@CurrentUser() user: { id: string }, @Body() dto: CreateDonationCheckoutDto) {
+    return this.monetizationService.createDonationCheckoutSession(user.id, dto);
+  }
+
+  @Post('create-donation-checkout')
+  @UseGuards(JwtAuthGuard)
+  createDonationCheckoutAlias(@CurrentUser() user: { id: string }, @Body() dto: CreateDonationCheckoutDto) {
     return this.monetizationService.createDonationCheckoutSession(user.id, dto);
   }
 
