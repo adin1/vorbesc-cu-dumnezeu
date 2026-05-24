@@ -7,7 +7,6 @@ import { SectionHeader } from '@/components/ui/SectionHeader';
 import { updateSpiritualPreference } from '@/lib/api-client';
 import { getToken } from '@/lib/auth-token';
 
-const confessions = ['ORTHODOX', 'CATHOLIC', 'PROTESTANT', 'GENERAL'];
 const tones = ['GENTLE', 'BIBLICAL', 'PARENTAL', 'SIMPLE'];
 const goals = [
   'liniste',
@@ -21,7 +20,6 @@ const goals = [
 ];
 
 export default function OnboardingPage() {
-  const [confession, setConfession] = useState('GENERAL');
   const [tone, setTone] = useState('GENTLE');
   const [goal, setGoal] = useState('liniste');
   const [status, setStatus] = useState('');
@@ -36,7 +34,6 @@ export default function OnboardingPage() {
 
     try {
       await updateSpiritualPreference(token, {
-        confession,
         preferredTone: tone,
         spiritualGoal: goal,
       });
@@ -53,17 +50,6 @@ export default function OnboardingPage() {
       <Card>
         <h3>Alege preferintele</h3>
         <form className="form-grid" onSubmit={handleSave}>
-          <label>
-            Confesiune
-            <select value={confession} onChange={(event) => setConfession(event.target.value)}>
-              {confessions.map((value) => (
-                <option key={value} value={value}>
-                  {value}
-                </option>
-              ))}
-            </select>
-          </label>
-
           <label>
             Ton raspuns
             <select value={tone} onChange={(event) => setTone(event.target.value)}>

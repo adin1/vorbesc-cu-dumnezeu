@@ -30,7 +30,6 @@ export default function ProfilePage() {
   const [status, setStatus] = useState('');
 
   const [name, setName] = useState('');
-  const [denomination, setDenomination] = useState('GENERAL');
   const [tone, setTone] = useState('GENTLE');
   const [goal, setGoal] = useState('');
   const [notifyDaily, setNotifyDaily] = useState(true);
@@ -104,7 +103,6 @@ export default function ProfilePage() {
       .then((data) => {
         setProfile(data);
         setName(data.name);
-        setDenomination(data.denomination);
         setTone(data.spiritualPreference?.preferredTone ?? 'GENTLE');
         setGoal(data.spiritualPreference?.spiritualGoal ?? '');
         setNotifyDaily(data.notifyDaily ?? true);
@@ -122,9 +120,8 @@ export default function ProfilePage() {
     }
 
     try {
-      await updateProfile(token, { name, denomination, notifyDaily, notifyCommunity });
+      await updateProfile(token, { name, notifyDaily, notifyCommunity });
       await updateSpiritualPreference(token, {
-        confession: denomination,
         preferredTone: tone,
         spiritualGoal: goal,
       });
@@ -284,18 +281,6 @@ export default function ProfilePage() {
             <label>
               Nume
               <input value={name} onChange={(event) => setName(event.target.value)} />
-            </label>
-            <label>
-              Confesiune
-              <select
-                value={denomination}
-                onChange={(event) => setDenomination(event.target.value)}
-              >
-                <option value="ORTHODOX">ORTHODOX</option>
-                <option value="CATHOLIC">CATHOLIC</option>
-                <option value="PROTESTANT">PROTESTANT</option>
-                <option value="GENERAL">GENERAL</option>
-              </select>
             </label>
             <label>
               Ton preferat
