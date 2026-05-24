@@ -9,6 +9,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../../database/prisma.service';
 import { DashboardCacheService } from '../../common/dashboard-cache.service';
+import { MonetizationService } from '../monetization/monetization.service';
 import {
   CreateFavoriteVerseDto,
   UpdateProfileDto,
@@ -24,6 +25,7 @@ export class ProfileService {
     private readonly prisma: PrismaService,
     private readonly dashboardCache: DashboardCacheService,
     private readonly configService: ConfigService,
+    private readonly monetizationService: MonetizationService,
   ) {}
 
   async getDashboard(userId: string, days = 7) {
@@ -226,13 +228,16 @@ export class ProfileService {
   }
 
   async getProfile(userId: string) {
-    const user = await this.prisma.user.findUnique({
+    const [user, monetization] = await Promise.all([
+      this.prisma.user.findUnique({
       where: { id: userId },
       include: {
         spiritualPreference: true,
         favoriteVerses: { orderBy: { createdAt: 'desc' } },
       },
-    });
+      }),
+      this.monetizationService.getUserMonetizationSummary(userId),
+    ]);
 
     if (!user) {
       throw new NotFoundException('User not found');
@@ -244,6 +249,7 @@ export class ProfileService {
         user.spiritualPreference ??
         ({ preferredTone: 'GENTLE', spiritualGoal: '', confession: user.denomination } as const),
       savedPrayers: (await this.listSavedPrayers(userId, 10, 0)).items,
+      monetization,
     };
   }
 
@@ -301,7 +307,8 @@ export class ProfileService {
     return { items, total, limit, offset };
   }
 
-  addFavoriteVerse(userId: string, dto: CreateFavoriteVerseDto) {
+  async addFavoriteVerse(userId: string, dto: CreateFavoriteVerseDto) {
+    await this.monetizationService.ensureFavoriteVerseCapacity(userId);
     this.dashboardCache.invalidateUser(userId);
     return this.prisma.favoriteVerse.create({
       data: { userId, reference: dto.reference, text: dto.text },

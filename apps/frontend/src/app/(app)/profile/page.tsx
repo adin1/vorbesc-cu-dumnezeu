@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { FacebookGroupCard } from '@/components/ui/FacebookGroupCard';
+import { PremiumFeatureCard } from '@/components/ui/PremiumFeatureCard';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import {
   addFavoriteVerse,
@@ -17,9 +18,11 @@ import {
   getSavedPrayers,
   markAllNotificationsRead,
   markNotificationRead,
+  cancelSubscription,
   updateProfile,
   updateSpiritualPreference,
   type FavoriteVerse,
+  type MonetizationSummary,
   type NotificationItem,
   type ProfileResponse,
   type Prayer,
@@ -46,6 +49,7 @@ export default function ProfilePage() {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [verseQuery, setVerseQuery] = useState('');
   const [prayerQuery, setPrayerQuery] = useState('');
+  const [monetization, setMonetization] = useState<MonetizationSummary | null>(null);
 
   const refreshExtras = async (token: string) => {
     const [verses, prayers, notices] = await Promise.all([
@@ -103,6 +107,7 @@ export default function ProfilePage() {
     getProfile(token)
       .then((data) => {
         setProfile(data);
+        setMonetization(data.monetization ?? null);
         setName(data.name);
         setTone(data.spiritualPreference?.preferredTone ?? 'GENTLE');
         setGoal(data.spiritualPreference?.spiritualGoal ?? '');
@@ -128,6 +133,7 @@ export default function ProfilePage() {
       });
       const refreshed = await getProfile(token);
       setProfile(refreshed);
+      setMonetization(refreshed.monetization ?? null);
       setStatus('Profilul a fost actualizat.');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Eroare necunoscuta';
@@ -262,6 +268,22 @@ export default function ProfilePage() {
     }
   };
 
+  const handleCancelSubscription = async () => {
+    const token = getToken();
+    if (!token || !monetization?.activeSubscription) {
+      return;
+    }
+
+    try {
+      const updated = await cancelSubscription(token, monetization.activeSubscription.id);
+      setMonetization(updated);
+      setStatus('Abonamentul a fost actualizat pentru anulare la finalul perioadei curente.');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Eroare necunoscuta';
+      setStatus(`Eroare: ${message}`);
+    }
+  };
+
   const filteredFavoriteVerses = favoriteVerses.filter((verse) =>
     `${verse.reference} ${verse.text}`.toLowerCase().includes(verseQuery.toLowerCase()),
   );
@@ -331,6 +353,53 @@ export default function ProfilePage() {
       </Card>
 
       <Card>
+        <h3>Abonament și susținere</h3>
+        {monetization?.currentPlan ? (
+          <>
+            <p>
+              <strong>Plan curent:</strong> {monetization.currentPlan.name}
+            </p>
+            <p className="muted">
+              {monetization.activeSubscription
+                ? `Status abonament: ${monetization.activeSubscription.status}`
+                : 'Momentan ești pe planul gratuit.'}
+            </p>
+            {monetization.activeSubscription ? (
+              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 10 }}>
+                <Button type="button" variant="secondary" onClick={handleCancelSubscription}>
+                  Anulează abonamentul
+                </Button>
+                <a className="button" href="/premium">
+                  Gestionează abonamentul
+                </a>
+              </div>
+            ) : (
+              <a className="button" href="/premium">
+                Descoperă Premium
+              </a>
+            )}
+            <div style={{ marginTop: 14 }}>
+              <h4>Istoric donații</h4>
+              {monetization.donationHistory.length ? (
+                <ul>
+                  {monetization.donationHistory.slice(0, 5).map((donation) => (
+                    <li key={donation.id}>
+                      {(donation.amount / 100).toFixed(2)} {donation.currency} •{' '}
+                      {new Date(donation.createdAt).toLocaleDateString('ro-RO')}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="muted">Nu există donații înregistrate încă.</p>
+              )}
+            </div>
+          </>
+        ) : (
+          <p className="muted">Detaliile abonamentului nu sunt disponibile momentan.</p>
+        )}
+      </Card>
+
+      <Card>
         <h3>Versete favorite</h3>
         <div className="form-grid">
           <label>
@@ -360,6 +429,9 @@ export default function ProfilePage() {
           <Button type="button" onClick={handleAddFavoriteVerse}>
             Adauga verset favorit
           </Button>
+          {!monetization?.featureAccess.unlimitedFavorites ? (
+            <p className="muted">Planul gratuit permite până la 10 versete favorite.</p>
+          ) : null}
         </div>
         {filteredFavoriteVerses.length ? (
           <ul>
@@ -470,6 +542,13 @@ export default function ProfilePage() {
           <p className="muted">Nu exista notificari.</p>
         )}
       </Card>
+
+      {!monetization?.featureAccess.premiumThemes ? (
+        <PremiumFeatureCard
+          title="Temele premium fac parte din experiența Premium."
+          description="Poți păstra tema actuală sau poți descoperi teme suplimentare discrete din zona Premium."
+        />
+      ) : null}
       <FacebookGroupCard />
       {status ? <p className="muted">{status}</p> : null}
     </div>

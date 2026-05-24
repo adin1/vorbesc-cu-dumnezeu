@@ -10,13 +10,13 @@ export class PlansController {
   constructor(private readonly plansService: PlansService) {}
 
   @Get()
-  list() {
-    return this.plansService.list();
+  list(@CurrentUser() user: { id: string }) {
+    return this.plansService.list(user.id);
   }
 
   @Get(':id')
-  byId(@Param('id') id: string) {
-    return this.plansService.byId(id);
+  byId(@CurrentUser() user: { id: string }, @Param('id') id: string) {
+    return this.plansService.byId(user.id, id);
   }
 
   @Post(':id/start')

@@ -4,6 +4,10 @@ import * as bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
+  await prisma.userSubscription.deleteMany();
+  await prisma.donation.deleteMany();
+  await prisma.subscriptionPlan.deleteMany();
+  await prisma.premiumFeature.deleteMany();
   await prisma.prayerSupport.deleteMany();
   await prisma.prayerRequest.deleteMany();
   await prisma.userPlanProgress.deleteMany();
@@ -43,6 +47,96 @@ async function main() {
       denomination: 'GENERAL',
     },
   });
+
+  const premiumFeatures = [
+    {
+      name: 'Rugăciuni audio',
+      slug: 'audio-prayers',
+      description: 'Ascultă rugăciuni rostite cu ton calm, potrivite pentru liniște și reflecție.',
+    },
+    {
+      name: 'Export PDF elegant',
+      slug: 'pdf-export',
+      description: 'Exportă jurnalul și reflecțiile într-un format PDF curat și ușor de păstrat.',
+    },
+    {
+      name: 'Teme premium',
+      slug: 'premium-themes',
+      description: 'Schimbă atmosfera vizuală a aplicației cu teme premium discrete.',
+    },
+    {
+      name: 'Favorite nelimitate',
+      slug: 'unlimited-favorites',
+      description: 'Păstrează fără limită versetele care îți vorbesc cel mai mult.',
+    },
+    {
+      name: 'Notificări personalizate',
+      slug: 'custom-notifications',
+      description: 'Primește notificări adaptate ritmului tău spiritual și momentelor importante.',
+    },
+    {
+      name: 'Profiluri de familie',
+      slug: 'family-profiles',
+      description: 'Organizează trasee spirituale pentru familie într-un spațiu comun și blând.',
+    },
+  ];
+
+  await prisma.premiumFeature.createMany({ data: premiumFeatures });
+
+  const subscriptionPlans = [
+    {
+      name: 'Gratuit',
+      slug: 'gratuit',
+      description: 'Accesul de bază pentru rugăciune, reflecție și comunitate.',
+      priceMonthly: 0,
+      features: [
+        'Versetul zilei',
+        'Rugăciuni de bază',
+        'Jurnal simplu',
+        'Comunitate',
+        '3 planuri spirituale gratuite',
+      ],
+    },
+    {
+      name: 'Premium Basic',
+      slug: 'premium-basic',
+      description: 'Pentru cei care doresc instrumente suplimentare și un ritm spiritual mai bogat.',
+      priceMonthly: 1900,
+      features: [
+        'Toate planurile spirituale',
+        'Favorite nelimitate',
+        'Teme premium',
+        'Rugăciuni audio',
+        'Export PDF elegant',
+        'Notificări personalizate',
+      ],
+    },
+    {
+      name: 'Premium Family',
+      slug: 'premium-family',
+      description: 'Un spațiu comun pentru familie, cu funcții extinse și acces anticipat la noutăți.',
+      priceMonthly: 3900,
+      features: [
+        'Toate funcțiile premium',
+        'Profiluri familie',
+        'Jurnal comun',
+        'Planuri pentru părinți și copii',
+        'Acces anticipat la funcții noi',
+      ],
+    },
+  ];
+
+  for (const plan of subscriptionPlans) {
+    await prisma.subscriptionPlan.create({
+      data: {
+        name: plan.name,
+        slug: plan.slug,
+        description: plan.description,
+        priceMonthly: plan.priceMonthly,
+        features: JSON.stringify(plan.features),
+      },
+    });
+  }
 
   const categories = [
     'Dimineață',
@@ -269,13 +363,13 @@ async function main() {
   }
 
   const plans = [
-    { title: '7 zile pentru liniște', days: 7 },
-    { title: '7 zile pentru iertare', days: 7 },
-    { title: '7 zile de recunoștință', days: 7 },
-    { title: '14 zile pentru vindecare sufletească', days: 14 },
-    { title: '30 zile cu Psalmii', days: 30 },
-    { title: '7 zile pentru mame', days: 7 },
-    { title: '7 zile pentru adolescenți', days: 7 },
+    { title: '7 zile pentru liniște', days: 7, isPremium: false, premiumTier: null },
+    { title: '7 zile pentru iertare', days: 7, isPremium: false, premiumTier: null },
+    { title: '7 zile de recunoștință', days: 7, isPremium: false, premiumTier: null },
+    { title: '14 zile pentru vindecare sufletească', days: 14, isPremium: true, premiumTier: 'PREMIUM_BASIC' },
+    { title: '30 zile cu Psalmii', days: 30, isPremium: true, premiumTier: 'PREMIUM_BASIC' },
+    { title: '7 zile pentru mame', days: 7, isPremium: true, premiumTier: 'PREMIUM_FAMILY' },
+    { title: '7 zile pentru adolescenți', days: 7, isPremium: true, premiumTier: 'PREMIUM_FAMILY' },
   ];
 
   for (const plan of plans) {
@@ -284,6 +378,8 @@ async function main() {
         title: plan.title,
         description: `Plan ghidat: ${plan.title}`,
         durationDays: plan.days,
+        isPremium: plan.isPremium,
+        premiumTier: plan.premiumTier,
       },
     });
 
@@ -354,7 +450,37 @@ async function main() {
         title: 'Cerere nouă în comunitate',
         body: 'Cineva a postat o nouă cerere de rugăciune. Intră și oferă sprijin.',
       },
+      {
+        userId: demoUser.id,
+        title: 'Sprijin pentru comunitate',
+        body: 'Dacă aplicația îți este de folos, poți susține dezvoltarea ei printr-o donație sau un plan premium.',
+      },
     ],
+  });
+
+  const premiumBasicPlan = await prisma.subscriptionPlan.findUnique({ where: { slug: 'premium-basic' } });
+
+  if (premiumBasicPlan) {
+    await prisma.userSubscription.create({
+      data: {
+        userId: helperUser.id,
+        planId: premiumBasicPlan.id,
+        status: 'ACTIVE',
+        provider: 'MANUAL',
+        startedAt: new Date(),
+      },
+    });
+  }
+
+  await prisma.donation.create({
+    data: {
+      userId: demoUser.id,
+      amount: 2500,
+      currency: 'RON',
+      provider: 'MANUAL',
+      providerPaymentId: 'seed-donation-1',
+      message: 'Mulțumesc pentru liniștea pe care o aduce aplicația.',
+    },
   });
 
   await prisma.favoriteVerse.create({

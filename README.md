@@ -70,9 +70,107 @@ Setări producție:
 - `JWT_SECRET` -> valoare puternică
 - `NEXT_PUBLIC_API_URL` -> URL backend public
 - `FRONTEND_URL` -> domeniul frontend pentru CORS
+- `STRIPE_SECRET_KEY` -> cheie Stripe secret (backend)
+- `STRIPE_WEBHOOK_SECRET` -> secret webhook Stripe (backend)
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` -> cheie Stripe publică (frontend)
 
 Ghid complet pas cu pas (Vercel + Railway):
 - vezi `DEPLOY.md`
+
+## Monetizare Freemium + Donații
+
+Modelul de monetizare este discret, fără reclame agresive, iar funcțiile spirituale esențiale rămân disponibile gratuit.
+
+### Planuri
+
+- Gratuit
+   - versetul zilei
+   - rugăciuni de bază
+   - jurnal simplu
+   - comunitate
+   - 3 planuri spirituale gratuite
+
+- Premium Basic
+   - toate planurile spirituale
+   - favorite nelimitate
+   - teme premium
+   - rugăciuni audio
+   - export PDF elegant
+   - notificări personalizate
+
+- Premium Family
+   - toate funcțiile premium
+   - profiluri familie
+   - jurnal comun
+   - planuri pentru părinți/copii
+   - acces anticipat la funcții noi
+
+### Pagini și endpoint-uri monetizare
+
+- Frontend:
+   - `/premium`
+   - `/premium/success`
+   - `/premium/cancel`
+
+- Backend:
+   - `GET /monetization/plans`
+   - `GET /monetization/me`
+   - `POST /monetization/checkout/subscription`
+   - `POST /monetization/checkout/donation`
+   - `POST /monetization/checkout/verify`
+   - `POST /monetization/subscriptions/:id/cancel`
+   - `POST /monetization/webhook`
+
+### Configurare Stripe (local)
+
+1. Setează în `.env`:
+
+```env
+STRIPE_SECRET_KEY="sk_test_..."
+STRIPE_WEBHOOK_SECRET="whsec_..."
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_..."
+```
+
+2. Pornește aplicația:
+
+```bash
+npm run dev
+```
+
+3. Rulează Stripe CLI pentru webhook:
+
+```bash
+stripe listen --forward-to http://localhost:3001/monetization/webhook
+```
+
+4. Copiază secretul generat de Stripe CLI în `STRIPE_WEBHOOK_SECRET`.
+
+### Carduri Stripe de test
+
+- Card valid: `4242 4242 4242 4242`
+- Expirare: orice dată viitoare
+- CVC: orice 3 cifre
+- ZIP/Postal: orice cod valid
+
+### Verificări înainte de deploy producție
+
+- `npm run build` fără erori
+- `npm run test` backend fără erori
+- `npm run db:migrate` pe baza de date PostgreSQL
+- webhook Stripe configurat în Dashboard pe URL-ul backend-ului public:
+   - `https://<backend>/monetization/webhook`
+
+### Deploy producție (Vercel + Railway/Fly.io)
+
+- Frontend (Vercel):
+   - setează `NEXT_PUBLIC_API_URL`
+   - setează `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
+
+- Backend (Railway/Fly.io):
+   - setează `DATABASE_URL` PostgreSQL
+   - setează `STRIPE_SECRET_KEY`
+   - setează `STRIPE_WEBHOOK_SECRET`
+   - setează `FRONTEND_URL`
 
 ## Comunitate Facebook (integrare manuala)
 

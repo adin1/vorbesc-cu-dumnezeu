@@ -224,6 +224,54 @@ button:disabled {
   font-size: 16px;
 }
 
+.premium-soft-card {
+  border-color: rgba(199, 155, 82, 0.5);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(199, 155, 82, 0.2), transparent 40%),
+    linear-gradient(160deg, var(--surface), var(--bg-elevated));
+}
+
+.premium-hero-card {
+  border-color: rgba(31, 58, 95, 0.3);
+  background:
+    radial-gradient(circle at 0% 0%, rgba(31, 58, 95, 0.18), transparent 45%),
+    radial-gradient(circle at 100% 100%, rgba(199, 155, 82, 0.22), transparent 45%),
+    linear-gradient(150deg, var(--surface), var(--bg-elevated));
+}
+
+.premium-plan-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.premium-plan-card {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 14px;
+  background: var(--surface);
+  display: grid;
+  gap: 10px;
+}
+
+.premium-plan-card.is-current {
+  border-color: var(--accent);
+  box-shadow: 0 10px 24px rgba(199, 155, 82, 0.2);
+}
+
+.premium-plan-card ul {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+}
+
+.premium-price {
+  margin: 8px 0 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
 @media (max-width: 720px) {
   .facebook-group-header {
     grid-template-columns: 1fr;

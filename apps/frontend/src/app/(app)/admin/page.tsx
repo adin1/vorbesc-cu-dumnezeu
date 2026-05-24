@@ -70,6 +70,36 @@ export default function AdminPage() {
               <strong>{metrics.activePlans}</strong>
               <div className="muted">Planuri active</div>
             </div>
+            <div className="card">
+              <strong>{(metrics.totalDonations / 100).toFixed(2)} RON</strong>
+              <div className="muted">Total donații</div>
+            </div>
+            <div className="card">
+              <strong>{metrics.totalSubscriptions}</strong>
+              <div className="muted">Total abonamente</div>
+            </div>
+            <div className="card">
+              <strong>{(metrics.estimatedMonthlyRevenue / 100).toFixed(2)} RON</strong>
+              <div className="muted">Venit lunar estimat</div>
+            </div>
+            <div className="card">
+              <strong>{metrics.premiumUsers}</strong>
+              <div className="muted">Utilizatori premium</div>
+            </div>
+          </div>
+          <div style={{ marginTop: 12 }}>
+            <h4>Planuri monetizare active</h4>
+            {metrics.activeMonetizationPlans.length ? (
+              <ul>
+                {metrics.activeMonetizationPlans.map((plan) => (
+                  <li key={plan.slug}>
+                    {plan.name}: {plan.subscribers} abonați
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="muted">Nu există planuri active momentan.</p>
+            )}
           </div>
           <p className="muted" style={{ marginTop: 10 }}>
             Ultima actualizare: {new Date(metrics.refreshedAt).toLocaleString('ro-RO')}

@@ -6,3 +6,7 @@ dist
 coverage
 *.log
 apps/backend/prisma/dev.db
+apps/backend/prisma/dev.db-journal
+.vercel
+.railway
+stripe-events.log

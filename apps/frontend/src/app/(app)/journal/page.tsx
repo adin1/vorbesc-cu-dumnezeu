@@ -3,12 +3,15 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { PremiumFeatureCard } from '@/components/ui/PremiumFeatureCard';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import {
   createJournalEntry,
   deleteJournalEntry,
   exportJournalEntries,
+  getMonetizationSummary,
   getJournalEntries,
+  type MonetizationSummary,
   type JournalEntry,
   updateJournalEntry,
 } from '@/lib/api-client';
@@ -17,6 +20,7 @@ import { getToken } from '@/lib/auth-token';
 export default function JournalPage() {
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [monetization, setMonetization] = useState<MonetizationSummary | null>(null);
   const [form, setForm] = useState({ mood: '', burden: '', gratitude: '', prayerToday: '' });
   const [status, setStatus] = useState('');
 
@@ -29,6 +33,8 @@ export default function JournalPage() {
     try {
       const data = await getJournalEntries(token);
       setEntries(data);
+      const money = await getMonetizationSummary(token);
+      setMonetization(money);
     } catch {
       setEntries([]);
     }
@@ -198,6 +204,14 @@ export default function JournalPage() {
         <Button type="button" onClick={handleExport}>
           Ruleaza export
         </Button>
+        {!monetization?.featureAccess.pdfExport ? (
+          <div style={{ marginTop: 12 }}>
+            <PremiumFeatureCard
+              title="Exportul PDF elegant face parte din experiența Premium."
+              description="Exportul JSON rămâne disponibil pentru toți utilizatorii."
+            />
+          </div>
+        ) : null}
       </Card>
 
       {status ? <p className="muted">{status}</p> : null}

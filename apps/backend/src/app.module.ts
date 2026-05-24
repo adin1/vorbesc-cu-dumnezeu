@@ -11,6 +11,7 @@ import { GdprModule } from './modules/gdpr/gdpr.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { ProfileModule } from './modules/profile/profile.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { MonetizationModule } from './modules/monetization/monetization.module';
 import { PrismaService } from './database/prisma.service';
 import { CommonModule } from './common/common.module';
 import { HealthController } from './health.controller';
@@ -30,6 +31,7 @@ import { HealthController } from './health.controller';
     NotificationsModule,
     ProfileModule,
     AdminModule,
+    MonetizationModule,
   ],
   controllers: [HealthController],
   providers: [PrismaService],

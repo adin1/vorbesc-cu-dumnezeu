@@ -89,6 +89,15 @@ export type AdminMetricsResponse = {
   journalEntries: number;
   prayerRequests: number;
   activePlans: number;
+  totalDonations: number;
+  totalSubscriptions: number;
+  estimatedMonthlyRevenue: number;
+  premiumUsers: number;
+  activeMonetizationPlans: Array<{
+    slug: string;
+    name: string;
+    subscribers: number;
+  }>;
   refreshedAt: string;
 };
 
@@ -111,6 +120,71 @@ export type SpiritualPlan = {
   title: string;
   description: string;
   durationDays: number;
+  isPremium?: boolean;
+  premiumTier?: string | null;
+  locked?: boolean;
+};
+
+export type SubscriptionPlan = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  priceMonthly: number;
+  features: string[];
+  isActive: boolean;
+  createdAt: string;
+};
+
+export type UserSubscription = {
+  id: string;
+  status: string;
+  startedAt: string;
+  expiresAt?: string | null;
+  provider: string;
+  providerSubscriptionId?: string | null;
+  plan: SubscriptionPlan;
+};
+
+export type Donation = {
+  id: string;
+  amount: number;
+  currency: string;
+  provider: string;
+  providerPaymentId?: string | null;
+  message?: string | null;
+  createdAt: string;
+};
+
+export type PremiumFeature = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  createdAt: string;
+};
+
+export type MonetizationSummary = {
+  currentPlan: SubscriptionPlan | null;
+  activeSubscription: UserSubscription | null;
+  donationHistory: Donation[];
+  quickDonationValues: number[];
+  premiumFeatures: PremiumFeature[];
+  featureAccess: {
+    audioPrayers: boolean;
+    pdfExport: boolean;
+    premiumThemes: boolean;
+    unlimitedFavorites: boolean;
+    customNotifications: boolean;
+    familyProfiles: boolean;
+  };
+  favoriteLimit: number | null;
+  emails: {
+    donationThankYou: { subject: string; preview: string; text: string; html: string };
+    premiumConfirmation: { subject: string; preview: string; text: string; html: string };
+    subscriptionExpiring: { subject: string; preview: string; text: string; html: string };
+    premiumWelcome: { subject: string; preview: string; text: string; html: string };
+  };
 };
 
 export type PrayerRequest = {
@@ -163,6 +237,23 @@ export type ProfileResponse = {
   spiritualPreference: SpiritualPreference;
   favoriteVerses?: FavoriteVerse[];
   savedPrayers?: Prayer[];
+  monetization?: MonetizationSummary;
+};
+
+export type CheckoutSessionResponse = {
+  sessionId: string;
+  url: string | null;
+};
+
+export type CheckoutVerificationResponse = {
+  id: string;
+  status: string | null;
+  paymentStatus: string | null;
+  mode: string;
+  amountTotal: number | null;
+  currency: string | null;
+  customerEmail: string | null;
+  metadata?: Record<string, string>;
 };
 
 export type ProfileStats = {
@@ -291,6 +382,33 @@ export function sendSpiritualMessage(
 
 export function getAdminMetrics(token: string) {
   return request<AdminMetricsResponse>('/admin/metrics', 'GET', undefined, token);
+}
+
+export function getMonetizationPlans(token: string) {
+  return request<SubscriptionPlan[]>('/monetization/plans', 'GET', undefined, token);
+}
+
+export function getMonetizationSummary(token: string) {
+  return request<MonetizationSummary>('/monetization/me', 'GET', undefined, token);
+}
+
+export function createSubscriptionCheckout(token: string, planSlug: string) {
+  return request<CheckoutSessionResponse>('/monetization/checkout/subscription', 'POST', { planSlug }, token);
+}
+
+export function createDonationCheckout(
+  token: string,
+  payload: { amount: number; currency?: 'RON' | 'EUR'; message?: string },
+) {
+  return request<CheckoutSessionResponse>('/monetization/checkout/donation', 'POST', payload, token);
+}
+
+export function verifyCheckoutSession(token: string, sessionId: string) {
+  return request<CheckoutVerificationResponse>('/monetization/checkout/verify', 'POST', { sessionId }, token);
+}
+
+export function cancelSubscription(token: string, subscriptionId: string) {
+  return request<MonetizationSummary>(`/monetization/subscriptions/${subscriptionId}/cancel`, 'POST', {}, token);
 }
 
 export function getPrayers(token: string) {

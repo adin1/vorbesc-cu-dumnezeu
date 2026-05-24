@@ -3,12 +3,15 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { PremiumFeatureCard } from '@/components/ui/PremiumFeatureCard';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import {
   generatePrayer,
+  getMonetizationSummary,
   getPrayers,
   saveGeneratedPrayer,
   savePrayer,
+  type MonetizationSummary,
   type GeneratedPrayerResponse,
   type Prayer,
 } from '@/lib/api-client';
@@ -23,6 +26,7 @@ export default function PrayersPage() {
   const [savingPrayerId, setSavingPrayerId] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const [savingGenerated, setSavingGenerated] = useState(false);
+  const [monetization, setMonetization] = useState<MonetizationSummary | null>(null);
 
   useEffect(() => {
     const token = getToken();
@@ -30,7 +34,12 @@ export default function PrayersPage() {
       return;
     }
 
-    getPrayers(token).then(setItems).catch(() => setItems([]));
+    Promise.all([getPrayers(token), getMonetizationSummary(token)])
+      .then(([prayers, summary]) => {
+        setItems(prayers);
+        setMonetization(summary);
+      })
+      .catch(() => setItems([]));
   }, []);
 
   const handleSavePrayer = async (prayerId: string) => {
@@ -212,6 +221,22 @@ export default function PrayersPage() {
           </ul>
         ) : (
           <p className="muted">Nu există încă rugăciuni încărcate.</p>
+        )}
+      </Card>
+
+      <Card>
+        <h3>Rugăciuni audio</h3>
+        {monetization?.featureAccess.audioPrayers ? (
+          <ul>
+            <li>Psalmul 23 - Rugăciune de încredere</li>
+            <li>Rugăciune de seară pentru pace</li>
+            <li>Rugăciune pentru familie unită</li>
+          </ul>
+        ) : (
+          <PremiumFeatureCard
+            title="Rugăciunile audio fac parte din experiența Premium."
+            description="Accesează momente audio liniștite, potrivite pentru meditație și rugăciune zilnică."
+          />
         )}
       </Card>
       {status ? <p className="muted">{status}</p> : null}

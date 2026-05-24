@@ -10,6 +10,7 @@ const links = [
   { href: '/prayers', label: 'Rugăciuni' },
   { href: '/journal', label: 'Jurnal' },
   { href: '/plans', label: 'Planuri' },
+  { href: '/premium', label: 'Premium' },
   { href: '/community', label: 'Comunitate' },
   { href: '/notifications', label: 'Notificari' },
   { href: '/profile', label: 'Profil' },

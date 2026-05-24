@@ -1,18 +1,20 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../../database/prisma.service';
+import { MonetizationService } from '../monetization/monetization.service';
 
 @Injectable()
 export class AdminService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly configService: ConfigService,
+    private readonly monetizationService: MonetizationService,
   ) {}
 
   async metrics(userEmail: string) {
     this.assertAdmin(userEmail);
 
-    const [users, prayers, journalEntries, prayerRequests, activePlanRows] = await Promise.all([
+    const [users, prayers, journalEntries, prayerRequests, activePlanRows, monetization] = await Promise.all([
       this.prisma.user.count(),
       this.prisma.prayer.count({ where: { userId: null } }),
       this.prisma.journalEntry.count(),
@@ -22,6 +24,7 @@ export class AdminService {
         distinct: ['planId'],
         select: { planId: true },
       }),
+      this.monetizationService.getAdminMonetizationMetrics(),
     ]);
 
     return {
@@ -30,6 +33,11 @@ export class AdminService {
       journalEntries,
       prayerRequests,
       activePlans: activePlanRows.length,
+      totalDonations: monetization.totalDonations,
+      totalSubscriptions: monetization.totalSubscriptions,
+      estimatedMonthlyRevenue: monetization.estimatedMonthlyRevenue,
+      premiumUsers: monetization.premiumUsers,
+      activeMonetizationPlans: monetization.activePlans,
       refreshedAt: new Date().toISOString(),
     };
   }

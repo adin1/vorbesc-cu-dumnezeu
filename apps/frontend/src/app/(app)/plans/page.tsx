@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { PremiumFeatureCard } from '@/components/ui/PremiumFeatureCard';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import {
   getPlans,
@@ -96,14 +97,33 @@ export default function PlansPage() {
             {plans.map((plan) => (
               <li key={plan.id} style={{ marginBottom: 12 }}>
                 <strong>{plan.title}</strong> - {plan.durationDays} zile
+                {plan.locked ? <span className="muted"> • Premium</span> : null}
                 <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-                  <Button type="button" variant="secondary" onClick={() => handleStart(plan.id)}>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => handleStart(plan.id)}
+                    disabled={Boolean(plan.locked)}
+                  >
                     Start plan
                   </Button>
-                  <Button type="button" variant="secondary" onClick={() => handleAdvanceDay(plan.id)}>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => handleAdvanceDay(plan.id)}
+                    disabled={Boolean(plan.locked)}
+                  >
                     Marcheaza ziua urmatoare
                   </Button>
                 </div>
+                {plan.locked ? (
+                  <div style={{ marginTop: 10 }}>
+                    <PremiumFeatureCard
+                      title="Acest plan face parte din experiența Premium."
+                      description="Poți continua gratuit cu planurile de bază sau poți descoperi planurile extinse Premium."
+                    />
+                  </div>
+                ) : null}
                 {progressByPlanId[plan.id] ? (
                   <div className="muted" style={{ marginTop: 6 }}>
                     Progres curent: ziua {progressByPlanId[plan.id].dayNumber}
