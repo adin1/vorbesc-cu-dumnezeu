@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { FacebookGroupCard } from '@/components/ui/FacebookGroupCard';
+import { FacebookCommunityCard } from '@/components/ui/FacebookCommunityCard';
 import { PremiumFeatureCard } from '@/components/ui/PremiumFeatureCard';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import {
@@ -549,7 +549,7 @@ export default function ProfilePage() {
           description="Poți păstra tema actuală sau poți descoperi teme suplimentare discrete din zona Premium."
         />
       ) : null}
-      <FacebookGroupCard />
+      <FacebookCommunityCard />
       {status ? <p className="muted">{status}</p> : null}
     </div>
   );

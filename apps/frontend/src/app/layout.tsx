@@ -1,5 +1,5 @@
 import './globals.css';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Merriweather, Nunito } from 'next/font/google';
 import { ServiceWorkerRegister } from '@/components/ui/ServiceWorkerRegister';
 
@@ -9,8 +9,11 @@ const sans = Nunito({ subsets: ['latin'], variable: '--font-sans' });
 export const metadata: Metadata = {
   title: 'Vorbește cu Dumnezeu',
   description: 'Ghid spiritual creștin cu rugăciuni, versete și reflecție zilnică.',
-  themeColor: '#1f3a5f',
   manifest: '/manifest.webmanifest',
+};
+
+export const viewport: Viewport = {
+  themeColor: '#1f3a5f',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

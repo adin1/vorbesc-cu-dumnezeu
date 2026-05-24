@@ -224,6 +224,12 @@ button:disabled {
   font-size: 16px;
 }
 
+.facebook-community-card {
+  background:
+    radial-gradient(circle at 95% 8%, rgba(31, 58, 95, 0.15), transparent 20%),
+    linear-gradient(160deg, var(--surface), var(--bg-elevated));
+}
+
 .premium-soft-card {
   border-color: rgba(199, 155, 82, 0.5);
   background:
