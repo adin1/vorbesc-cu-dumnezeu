@@ -3,7 +3,7 @@
 MVP spiritual creștin, fără API extern AI, cu ghid spiritual bazat pe date predefinite din baza de date.
 
 ## Aplicație live
-- https://vorbeste-cu-Dumnezeu.vercel.app
+- https://vorbeste-cu-dumnezeu.vercel.app
 
 ## Stack
 - Frontend: Next.js 16 + TypeScript
@@ -81,6 +81,9 @@ Aplicatia include integrare catre un grup Facebook oficial, fara automatizari, s
 ### Nume grup oficial
 - Vorbeste cu Dumnezeu - Comunitate de rugaciune si sprijin
 
+### URL grup oficial
+- https://www.facebook.com/groups/vorbestecudumnezeu
+
 ### 1) Texte pregatite pentru Facebook
 
 Descriere scurta (max. 150 caractere):
@@ -117,7 +120,7 @@ Prima postare oficiala in grup:
 3. In fisierul `.env` din root setezi:
 
 ```env
-NEXT_PUBLIC_FACEBOOK_GROUP_URL="https://facebook.com/groups/..."
+NEXT_PUBLIC_FACEBOOK_GROUP_URL="https://www.facebook.com/groups/vorbestecudumnezeu"
 ```
 
 4. Rulezi frontend-ul din nou (`npm run dev`) sau faci redeploy pentru productie.
@@ -139,7 +142,7 @@ Integrarea apare in:
 1. Setezi `NEXT_PUBLIC_FACEBOOK_GROUP_URL` in `.env`.
 2. Rulezi `npm run dev`.
 3. Verifici paginile `/home`, `/community`, `/profile`.
-4. Confirmi ca butonul deschide grupul in tab nou.
+4. Confirmi ca butonul deschide grupul `https://www.facebook.com/groups/vorbestecudumnezeu` in tab nou.
 5. Stergi temporar valoarea din `.env` si verifici mesajul fallback.
 
 ### 5) Securitate si conformitate
