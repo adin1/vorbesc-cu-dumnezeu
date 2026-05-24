@@ -182,6 +182,9 @@ LEMONSQUEEZY_CHECKOUT_URL_DONATION_5000=""
 
 4. Frontend-ul nu necesită cheie publică suplimentară pentru Lemon Squeezy.
 
+5. Setup rapid în Railway din terminal (interactiv):
+   - `powershell -ExecutionPolicy Bypass -File scripts/set-lemon-railway-vars.ps1`
+
 ### Testare Stripe Sandbox
 
 - Card valid: `4242 4242 4242 4242`
