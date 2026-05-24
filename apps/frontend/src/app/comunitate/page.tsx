@@ -4,7 +4,10 @@ import { SectionHeader } from '@/components/ui/SectionHeader';
 
 export default function ComunitatePublicPage() {
   const groupUrl = process.env.NEXT_PUBLIC_FACEBOOK_GROUP_URL?.trim();
-  const appUrl = process.env.NEXT_PUBLIC_APP_PUBLIC_URL?.trim() || 'https://vorbeste-cu-dumnezeu.vercel.app';
+  const appUrl =
+    process.env.NEXT_PUBLIC_APP_URL?.trim() ||
+    process.env.NEXT_PUBLIC_APP_PUBLIC_URL?.trim() ||
+    'https://vorbeste-cu-dumnezeu.vercel.app';
 
   return (
     <main className="page-grid" style={{ maxWidth: 920, margin: '0 auto', padding: 24 }}>

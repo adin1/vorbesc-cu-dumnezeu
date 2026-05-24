@@ -7,6 +7,7 @@ import { login, postAcquisition, register } from '@/lib/api-client';
 import { setToken } from '@/lib/auth-token';
 import { Disclaimer } from '@/components/ui/Disclaimer';
 import { Button } from '@/components/ui/Button';
+import { hasAnalyticsConsent } from '@/lib/consent';
 
 const ACQUISITION_KEY = 'first_acquisition_payload';
 
@@ -41,7 +42,9 @@ export default function LandingPage() {
     };
 
     localStorage.setItem(ACQUISITION_KEY, JSON.stringify(payload));
-    postAcquisition(payload).catch(() => undefined);
+    if (hasAnalyticsConsent()) {
+      postAcquisition(payload).catch(() => undefined);
+    }
   }, []);
 
   const getFriendlyError = (message: string) => {
@@ -70,7 +73,7 @@ export default function LandingPage() {
               name,
               denomination: 'GENERAL',
               acquisition:
-                typeof window !== 'undefined'
+                typeof window !== 'undefined' && hasAnalyticsConsent()
                   ? JSON.parse(localStorage.getItem(ACQUISITION_KEY) || 'null') || undefined
                   : undefined,
             })
@@ -165,7 +168,8 @@ export default function LandingPage() {
 
       <Disclaimer />
       <p className="muted" style={{ marginTop: -8 }}>
-        <Link href="/privacy">Politica de confidențialitate</Link> • <Link href="/terms">Termeni și condiții</Link>
+        <Link href="/privacy-policy">Politica de confidențialitate</Link> • <Link href="/terms">Termeni și condiții</Link> •{' '}
+        <Link href="/disclaimer">Disclaimer</Link>
       </p>
     </main>
   );

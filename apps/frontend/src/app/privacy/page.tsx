@@ -4,11 +4,15 @@ export default function PrivacyPage() {
       <section className="card">
         <h1>Politica de confidențialitate</h1>
         <p>
-          Colectăm minimul de date necesare pentru autentificare, progres spiritual și funcțiile comunității.
-          Datele nu sunt vândute către terți.
+          Vorbește cu Dumnezeu este o aplicație software/community app pentru sprijin spiritual. Nu este ONG și
+          nu vorbește în numele lui Dumnezeu.
         </p>
         <p>
-          Pentru solicitări GDPR, folosește secțiunea dedicată din aplicație sau contactul afișat în README.
+          Colectăm minimul de date necesare pentru autentificare, funcționalități de bază și analytics agregat pe
+          bază de consimțământ. Datele nu sunt vândute către terți.
+        </p>
+        <p>
+          Pentru solicitări GDPR, poți exporta, descărca sau șterge datele personale din secțiunea Profil.
         </p>
       </section>
     </main>

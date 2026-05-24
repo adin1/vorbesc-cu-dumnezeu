@@ -1,6 +1,7 @@
 import './globals.css';
 import type { Metadata, Viewport } from 'next';
 import { Merriweather, Nunito } from 'next/font/google';
+import { CookieConsentBanner } from '@/components/ui/CookieConsentBanner';
 import { ServiceWorkerRegister } from '@/components/ui/ServiceWorkerRegister';
 
 const serif = Merriweather({ subsets: ['latin'], variable: '--font-serif' });
@@ -22,6 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={`${serif.variable} ${sans.variable}`}>
         <ServiceWorkerRegister />
         {children}
+        <CookieConsentBanner />
       </body>
     </html>
   );

@@ -7,6 +7,7 @@ type FacebookCommunityCardProps = {
 export function FacebookCommunityCard({ className = '' }: FacebookCommunityCardProps) {
   const groupUrl = process.env.NEXT_PUBLIC_FACEBOOK_GROUP_URL?.trim();
   const appUrl =
+    process.env.NEXT_PUBLIC_APP_URL?.trim() ||
     process.env.NEXT_PUBLIC_APP_PUBLIC_URL?.trim() ||
     'https://vorbeste-cu-dumnezeu.vercel.app';
 

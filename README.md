@@ -75,8 +75,10 @@ Setări producție:
 - `STRIPE_SECRET_KEY` -> cheie Stripe secret (backend)
 - `STRIPE_WEBHOOK_SECRET` -> secret webhook Stripe (backend)
 - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` -> cheie Stripe publică (frontend)
-- `NEXT_PUBLIC_PRIVACY_URL` -> URL pagină privacy
+- `NEXT_PUBLIC_APP_URL` -> URL aplicație publică
+- `NEXT_PUBLIC_PRIVACY_URL` -> URL pagină privacy policy
 - `NEXT_PUBLIC_TERMS_URL` -> URL pagină terms
+- `NEXT_PUBLIC_DISCLAIMER_URL` -> URL pagină disclaimer
 
 Ghid complet pas cu pas (Vercel + Railway):
 - vezi `DEPLOY.md`
@@ -288,13 +290,47 @@ Acesta include:
 
 Aplicația afișează pe ecranele principale următorul disclaimer:
 
-"Această aplicație oferă rugăciuni, versete și reflecții pentru sprijin spiritual. Nu înlocuiește ajutorul medical, psihologic, juridic sau pastoral."
+"Această aplicație oferă rugăciuni, reflecții și sprijin spiritual. Nu înlocuiește ajutorul medical, psihologic, juridic sau pastoral."
+
+Aplicația nu vorbește în numele lui Dumnezeu, nu promite vindecări și nu oferă garanții spirituale.
+
+## GDPR și legal compliance
+
+- Rute publice legale:
+   - `/privacy-policy`
+   - `/terms`
+   - `/disclaimer`
+- Alias menținute pentru compatibilitate:
+   - `/privacy`
+- Gestionare consimțământ cookie/analytics/marketing:
+   - banner global de consimțământ
+   - setări în profil
+- Funcții GDPR în profil:
+   - export date
+   - descărcare date personale
+   - ștergere cont
+
+Documente legale în root:
+- `privacy-policy.md`
+- `terms-of-service.md`
+- `spiritual-disclaimer.md`
+
+## Security hardening (backend)
+
+- `helmet` activ pentru secure headers
+- rate limiting global (`120 req/min/IP`)
+- filtru global pentru excepții în producție (fără stack trace în răspuns)
+- verificare strictă `JWT_SECRET` în producție (refuză pornirea cu secret invalid)
 
 ## Pregătire Google Play (PWA/TWA)
 
 - Manifest + Service Worker de bază în frontend
-- Pagini publice: `/privacy`, `/terms`
+- Manifest static suplimentar: `apps/frontend/public/manifest.json`
+- Pagini publice: `/privacy-policy`, `/terms`, `/disclaimer`
 - Asset-uri de publicare în `play-store-assets/`
+- Fișiere obligatorii:
+   - `play-store-assets/content-rating.md`
+   - `play-store-assets/data-safety.md`
 - Pentru TWA (Bubblewrap):
    1. `npm i -g @bubblewrap/cli`
    2. `bubblewrap init --manifest https://<domeniu-frontend>/manifest.webmanifest`

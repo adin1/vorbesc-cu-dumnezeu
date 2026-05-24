@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { FacebookCommunityCard } from '@/components/ui/FacebookCommunityCard';
+import { PrivacySettings } from '@/components/ui/PrivacySettings';
 import { PremiumFeatureCard } from '@/components/ui/PremiumFeatureCard';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import {
@@ -194,6 +195,29 @@ export default function ProfilePage() {
     }
   };
 
+  const handleDownloadPersonalData = async () => {
+    const token = getToken();
+    if (!token) {
+      setStatus('Autentificarea este necesara.');
+      return;
+    }
+
+    try {
+      const data = await exportGdprData(token);
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = 'date-personale-gdpr.json';
+      anchor.click();
+      URL.revokeObjectURL(url);
+      setStatus('Datele personale au fost descărcate.');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Eroare necunoscuta';
+      setStatus(`Eroare: ${message}`);
+    }
+  };
+
   const handleDeleteAccount = async () => {
     const confirmed = window.confirm('Confirmi stergerea contului? Aceasta actiune este ireversibila.');
     if (!confirmed) {
@@ -341,6 +365,9 @@ export default function ProfilePage() {
               </Button>
               <Button type="button" variant="secondary" onClick={handleExport}>
                 Export date GDPR
+              </Button>
+              <Button type="button" variant="secondary" onClick={handleDownloadPersonalData}>
+                Descarca date personale
               </Button>
               <Button type="button" variant="secondary" onClick={handleDeleteAccount}>
                 Sterge cont
@@ -550,6 +577,7 @@ export default function ProfilePage() {
         />
       ) : null}
       <FacebookCommunityCard />
+      <PrivacySettings />
       {status ? <p className="muted">{status}</p> : null}
     </div>
   );
