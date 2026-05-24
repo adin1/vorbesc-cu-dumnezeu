@@ -389,7 +389,7 @@ export default function ProfilePage() {
             <p className="muted">
               {monetization.activeSubscription
                 ? `Status abonament: ${monetization.activeSubscription.status}`
-                : 'Momentan ești pe planul gratuit.'}
+                : 'Folosești planul Gratuit.'}
             </p>
             {monetization.activeSubscription ? (
               <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 10 }}>
@@ -402,7 +402,7 @@ export default function ProfilePage() {
               </div>
             ) : (
               <a className="button" href="/premium">
-                Descoperă Premium
+                Mergi la Premium
               </a>
             )}
             <div style={{ marginTop: 14 }}>

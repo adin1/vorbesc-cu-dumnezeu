@@ -1,4 +1,4 @@
-import { IsIn, IsInt, IsOptional, IsPositive, IsString, MaxLength, Min } from 'class-validator';
+import { IsIn, IsInt, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class CreateSubscriptionCheckoutDto {
   @IsString()
@@ -7,7 +7,7 @@ export class CreateSubscriptionCheckoutDto {
 
 export class CreateDonationCheckoutDto {
   @IsInt()
-  @Min(500)
+  @IsIn([500, 1000, 2500, 5000])
   amount!: number;
 
   @IsOptional()
@@ -17,7 +17,7 @@ export class CreateDonationCheckoutDto {
 
   @IsOptional()
   @IsString()
-  @IsIn(['RON', 'EUR'])
+  @IsIn(['RON'])
   currency?: string;
 }
 

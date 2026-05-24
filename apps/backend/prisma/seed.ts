@@ -229,6 +229,7 @@ async function main() {
       slug: 'gratuit',
       description: 'Accesul de bază pentru rugăciune, reflecție și comunitate.',
       priceMonthly: 0,
+      stripePriceId: null,
       features: ['Versetul zilei', 'Rugăciuni de bază', 'Jurnal simplu', 'Comunitate', '3 planuri spirituale gratuite'],
     },
     {
@@ -236,6 +237,7 @@ async function main() {
       slug: 'premium-basic',
       description: 'Pentru cei care doresc instrumente suplimentare și un ritm spiritual mai bogat.',
       priceMonthly: 1900,
+      stripePriceId: null,
       features: [
         'Toate planurile spirituale',
         'Favorite nelimitate',
@@ -250,6 +252,7 @@ async function main() {
       slug: 'premium-family',
       description: 'Un spațiu comun pentru familie, cu funcții extinse și acces anticipat la noutăți.',
       priceMonthly: 3900,
+      stripePriceId: null,
       features: [
         'Toate funcțiile premium',
         'Profiluri familie',
@@ -267,6 +270,7 @@ async function main() {
         slug: plan.slug,
         description: plan.description,
         priceMonthly: plan.priceMonthly,
+        stripePriceId: plan.stripePriceId,
         features: JSON.stringify(plan.features),
       },
     });

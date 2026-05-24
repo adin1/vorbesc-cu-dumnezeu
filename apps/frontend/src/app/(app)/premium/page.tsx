@@ -100,7 +100,7 @@ export default function PremiumPage() {
     <div className="page-grid animate-in">
       <SectionHeader
         title="Premium"
-        subtitle="Sprijină comunitatea și descoperă experiența completă"
+        subtitle="Sprijină comunitatea. Descoperă experiența completă"
       />
 
       <Card className="premium-hero-card">
@@ -136,7 +136,11 @@ export default function PremiumPage() {
                   onClick={() => handleChoosePlan(plan.slug)}
                   disabled={loadingSlug === plan.slug}
                 >
-                  {loadingSlug === plan.slug ? 'Se pregătește...' : 'Alege planul'}
+                  {loadingSlug === plan.slug
+                    ? 'Se pregătește...'
+                    : plan.slug === 'premium-basic'
+                      ? 'Alege Premium Basic'
+                      : 'Alege Premium Family'}
                 </Button>
               )}
             </article>
@@ -152,7 +156,7 @@ export default function PremiumPage() {
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
           {quickValues.map((value) => (
             <Button key={value} type="button" variant={donationAmount === value ? 'primary' : 'secondary'} onClick={() => setDonationAmount(value)}>
-              {(value / 100).toFixed(0)} lei
+              {`Donează ${(value / 100).toFixed(0)} lei`}
             </Button>
           ))}
         </div>

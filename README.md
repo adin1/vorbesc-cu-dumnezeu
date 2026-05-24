@@ -121,20 +121,22 @@ Modelul de monetizare este discret, fără reclame agresive, iar funcțiile spir
 - Backend:
    - `GET /monetization/plans`
    - `GET /monetization/me`
+   - `POST /monetization/create-checkout-session`
+   - `POST /monetization/create-donation-checkout`
    - `POST /monetization/checkout/subscription`
    - `POST /monetization/checkout/donation`
    - `POST /monetization/checkout/verify`
    - `POST /monetization/subscriptions/:id/cancel`
    - `POST /monetization/webhook`
 
-### Configurare Stripe (local)
+### Configurare Stripe Sandbox (local)
 
 1. Setează în `.env`:
 
 ```env
-STRIPE_SECRET_KEY="sk_test_..."
-STRIPE_WEBHOOK_SECRET="whsec_..."
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_..."
+STRIPE_SECRET_KEY=""
+STRIPE_WEBHOOK_SECRET=""
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=""
 ```
 
 2. Pornește aplicația:
@@ -151,12 +153,19 @@ stripe listen --forward-to http://localhost:3001/monetization/webhook
 
 4. Copiază secretul generat de Stripe CLI în `STRIPE_WEBHOOK_SECRET`.
 
-### Carduri Stripe de test
+### Testare Stripe Sandbox
 
 - Card valid: `4242 4242 4242 4242`
 - Expirare: orice dată viitoare
 - CVC: orice 3 cifre
 - ZIP/Postal: orice cod valid
+- Webhook URL: `https://backend-api-production-7f6a.up.railway.app/monetization/webhook`
+- Evenimente webhook:
+   - `checkout.session.completed`
+   - `customer.subscription.created`
+   - `customer.subscription.updated`
+   - `customer.subscription.deleted`
+   - `payment_intent.succeeded`
 
 ### Verificări înainte de deploy producție
 

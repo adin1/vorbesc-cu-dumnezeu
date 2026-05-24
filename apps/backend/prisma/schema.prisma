@@ -234,6 +234,7 @@ model SubscriptionPlan {
   slug              String             @unique
   description       String
   priceMonthly      Int
+  stripePriceId     String?
   features          String
   isActive          Boolean            @default(true)
   createdAt         DateTime           @default(now())

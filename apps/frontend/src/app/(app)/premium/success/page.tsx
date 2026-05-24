@@ -10,6 +10,7 @@ import { verifyCheckoutSession, type CheckoutVerificationResponse } from '@/lib/
 
 export default function PremiumSuccessPage() {
   const params = useSearchParams();
+  const paymentType = params.get('type');
   const [result, setResult] = useState<CheckoutVerificationResponse | null>(null);
   const [status, setStatus] = useState('Verificăm plata...');
 
@@ -25,7 +26,7 @@ export default function PremiumSuccessPage() {
     verifyCheckoutSession(token, sessionId)
       .then((data) => {
         setResult(data);
-        setStatus('Plata a fost confirmată cu succes. Îți mulțumim!');
+        setStatus('Mulțumim! Plata a fost procesată cu succes.');
       })
       .catch((error) => {
         const message = error instanceof Error ? error.message : 'Eroare necunoscută';
@@ -35,7 +36,10 @@ export default function PremiumSuccessPage() {
 
   return (
     <div className="page-grid animate-in">
-      <SectionHeader title="Plată confirmată" subtitle="Mulțumim pentru susținere" />
+      <SectionHeader
+        title="Plată confirmată"
+        subtitle={paymentType === 'donation' ? 'Donația a fost înregistrată' : 'Abonamentul a fost activat'}
+      />
       <Card>
         <p>{status}</p>
         {result ? (

@@ -22,6 +22,7 @@ type ParsedSubscriptionPlan = {
   slug: string;
   description: string;
   priceMonthly: number;
+  stripePriceId: string | null;
   features: string[];
   isActive: boolean;
   createdAt: Date;
@@ -155,20 +156,27 @@ export class MonetizationService {
       mode: 'subscription',
       customer_email: user.email,
       allow_promotion_codes: true,
-      line_items: [
-        {
-          quantity: 1,
-          price_data: {
-            currency: 'ron',
-            unit_amount: plan.priceMonthly,
-            recurring: { interval: 'month' },
-            product_data: {
-              name: plan.name,
-              description: plan.description,
+      line_items: plan.stripePriceId
+        ? [
+            {
+              quantity: 1,
+              price: plan.stripePriceId,
             },
-          },
-        },
-      ],
+          ]
+        : [
+            {
+              quantity: 1,
+              price_data: {
+                currency: 'ron',
+                unit_amount: plan.priceMonthly,
+                recurring: { interval: 'month' },
+                product_data: {
+                  name: plan.name,
+                  description: plan.description,
+                },
+              },
+            },
+          ],
       metadata: {
         type: 'subscription',
         userId,
@@ -192,7 +200,7 @@ export class MonetizationService {
       throw new NotFoundException('Utilizatorul nu a fost găsit.');
     }
 
-    const currency = (dto.currency ?? 'RON').toLowerCase();
+    const currency = 'ron';
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       customer_email: user.email,
@@ -216,7 +224,7 @@ export class MonetizationService {
         userId,
         message: dto.message ?? '',
       },
-      success_url: `${this.getFrontendBaseUrl()}/premium/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${this.getFrontendBaseUrl()}/premium/success?type=donation&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${this.getFrontendBaseUrl()}/premium/cancel`,
     });
 
@@ -440,6 +448,7 @@ export class MonetizationService {
     slug: string;
     description: string;
     priceMonthly: number;
+    stripePriceId: string | null;
     features: string;
     isActive: boolean;
     createdAt: Date;
