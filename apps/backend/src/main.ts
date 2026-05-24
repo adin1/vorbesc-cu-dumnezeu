@@ -21,6 +21,12 @@ async function bootstrap() {
     throw new Error('JWT_SECRET este invalid pentru producție. Setează o valoare puternică.');
   }
 
+  // Railway runs behind a reverse proxy; trust X-Forwarded-* headers in production.
+  if (isProduction) {
+    const expressApp = app.getHttpAdapter().getInstance();
+    expressApp.set('trust proxy', 1);
+  }
+
   app.enableCors({
     origin: (origin, callback) => {
       if (!origin) {
