@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { FacebookGroupCard } from '@/components/ui/FacebookGroupCard';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import {
   createPrayerRequest,
@@ -86,7 +87,31 @@ export default function CommunityPage() {
 
   return (
     <div className="page-grid animate-in">
-      <SectionHeader title="Comunitate" subtitle="Cereri de rugăciune anonime, sprijin și moderare" />
+      <SectionHeader title="Comunitate" subtitle="Cereri de rugaciune, sprijin spiritual si legatura cu grupul oficial" />
+      <Card>
+        <h3>Mesaj inspirational</h3>
+        <p>
+          "Unde sunt doi sau trei adunati in Numele Meu, acolo sunt si Eu in mijlocul lor."
+        </p>
+        <p className="muted" style={{ marginTop: 0 }}>Matei 18:20</p>
+      </Card>
+      <FacebookGroupCard
+        title="Vorbeste cu Dumnezeu - Comunitate de rugaciune si sprijin"
+        description="Intra in grupul oficial pentru cereri de rugaciune, versete zilnice, incurajare si reflexie in pace."
+      />
+      {process.env.NEXT_PUBLIC_FACEBOOK_GROUP_URL ? (
+        <Card>
+          <h3>Acces rapid catre grup</h3>
+          <a
+            className="button facebook-group-button facebook-group-button-large"
+            href={process.env.NEXT_PUBLIC_FACEBOOK_GROUP_URL}
+            target="_blank"
+            rel="noreferrer noopener"
+          >
+            Intra in grupul de rugaciune
+          </a>
+        </Card>
+      ) : null}
       <Card>
         <h3>Publica o cerere de rugaciune</h3>
         <form className="form-grid" onSubmit={handleCreate}>
@@ -102,14 +127,6 @@ export default function CommunityPage() {
           </label>
           <Button type="submit">Publica cererea</Button>
         </form>
-      </Card>
-      <Card>
-        <h3>Acțiuni</h3>
-        <ul>
-          <li>Buton „Mă rog pentru tine”</li>
-          <li>Raportare conținut</li>
-          <li>Moderare admin</li>
-        </ul>
       </Card>
       <Card>
         <h3>Cereri din API</h3>

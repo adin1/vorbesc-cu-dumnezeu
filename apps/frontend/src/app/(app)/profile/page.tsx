@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { FacebookGroupCard } from '@/components/ui/FacebookGroupCard';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import {
   addFavoriteVerse,
@@ -469,6 +470,7 @@ export default function ProfilePage() {
           <p className="muted">Nu exista notificari.</p>
         )}
       </Card>
+      <FacebookGroupCard />
       {status ? <p className="muted">{status}</p> : null}
     </div>
   );

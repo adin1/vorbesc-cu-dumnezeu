@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { FacebookGroupCard } from '@/components/ui/FacebookGroupCard';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import {
   clearDashboardCache,
@@ -296,6 +297,7 @@ export default function HomePage() {
           </div>
         )}
       </Card>
+      <FacebookGroupCard />
       <Card>
         <h3>Recomandarea spirituală a zilei</h3>
         {recommendation ? (

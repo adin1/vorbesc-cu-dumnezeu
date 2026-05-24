@@ -181,3 +181,51 @@ button:disabled {
   height: 100%;
   background: linear-gradient(120deg, var(--accent), #e4bf7c);
 }
+
+.facebook-group-card {
+  background:
+    radial-gradient(circle at 95% 8%, rgba(31, 58, 95, 0.15), transparent 20%),
+    linear-gradient(160deg, var(--surface), var(--bg-elevated));
+}
+
+.facebook-group-header {
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  gap: 14px;
+  align-items: start;
+  margin-bottom: 14px;
+}
+
+.facebook-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(145deg, #1877f2, #2d5fb8);
+  box-shadow: 0 8px 20px rgba(24, 119, 242, 0.28);
+}
+
+.facebook-icon svg {
+  width: 28px;
+  height: 28px;
+  fill: #fff;
+}
+
+.facebook-group-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.facebook-group-button-large {
+  width: 100%;
+  min-height: 52px;
+  font-size: 16px;
+}
+
+@media (max-width: 720px) {
+  .facebook-group-header {
+    grid-template-columns: 1fr;
+  }
+}
