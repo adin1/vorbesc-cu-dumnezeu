@@ -72,8 +72,9 @@ export class MonetizationController {
   @Public()
   handleWebhook(
     @Headers('stripe-signature') stripeSignature: string | string[] | undefined,
+    @Headers('x-signature') lemonSignature: string | string[] | undefined,
     @Req() request: Request & { rawBody?: Buffer },
   ) {
-    return this.monetizationService.handleWebhook(stripeSignature, request.rawBody);
+    return this.monetizationService.handleWebhook(stripeSignature ?? lemonSignature, request.rawBody);
   }
 }

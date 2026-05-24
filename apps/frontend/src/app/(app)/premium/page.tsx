@@ -50,9 +50,13 @@ export default function PremiumPage() {
     try {
       setLoadingSlug(planSlug);
       const session = await createSubscriptionCheckout(token, planSlug);
+      if (session.url) {
+        window.location.href = session.url;
+        return;
+      }
       const stripe = await getStripeClient();
       if (!stripe) {
-        throw new Error('Stripe nu este disponibil momentan.');
+        throw new Error('Providerul de plăți nu este disponibil momentan.');
       }
       const result = await stripe.redirectToCheckout({ sessionId: session.sessionId });
       if (result.error) {
@@ -80,9 +84,13 @@ export default function PremiumPage() {
         currency: 'RON',
         message: donationMessage,
       });
+      if (session.url) {
+        window.location.href = session.url;
+        return;
+      }
       const stripe = await getStripeClient();
       if (!stripe) {
-        throw new Error('Stripe nu este disponibil momentan.');
+        throw new Error('Providerul de plăți nu este disponibil momentan.');
       }
       const result = await stripe.redirectToCheckout({ sessionId: session.sessionId });
       if (result.error) {

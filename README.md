@@ -153,6 +153,35 @@ stripe listen --forward-to http://localhost:3001/monetization/webhook
 
 4. Copiază secretul generat de Stripe CLI în `STRIPE_WEBHOOK_SECRET`.
 
+### Varianta fără PFA/SRL acum: Lemon Squeezy (Merchant of Record)
+
+Pentru lansare fără entitate juridică proprie imediată, poți folosi Lemon Squeezy ca Merchant of Record.
+
+1. Setează în backend:
+
+```env
+PAYMENT_PROVIDER="LEMONSQUEEZY"
+LEMONSQUEEZY_WEBHOOK_SECRET=""
+LEMONSQUEEZY_CHECKOUT_URL_PREMIUM_BASIC=""
+LEMONSQUEEZY_CHECKOUT_URL_PREMIUM_FAMILY=""
+LEMONSQUEEZY_CHECKOUT_URL_DONATION_500=""
+LEMONSQUEEZY_CHECKOUT_URL_DONATION_1000=""
+LEMONSQUEEZY_CHECKOUT_URL_DONATION_2500=""
+LEMONSQUEEZY_CHECKOUT_URL_DONATION_5000=""
+```
+
+2. Configurează webhook Lemon Squeezy către:
+   - `https://<backend>/monetization/webhook`
+
+3. Evenimente recomandate în Lemon Squeezy:
+   - `order_created`
+   - `subscription_created`
+   - `subscription_updated`
+   - `subscription_cancelled`
+   - `subscription_expired`
+
+4. Frontend-ul nu necesită cheie publică suplimentară pentru Lemon Squeezy.
+
 ### Testare Stripe Sandbox
 
 - Card valid: `4242 4242 4242 4242`

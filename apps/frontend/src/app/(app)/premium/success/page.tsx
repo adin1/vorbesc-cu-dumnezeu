@@ -18,7 +18,12 @@ export default function PremiumSuccessPage() {
     const sessionId = params.get('session_id');
     const token = getToken();
 
-    if (!sessionId || !token) {
+    if (!sessionId) {
+      setStatus('Mulțumim! Plata a fost procesată cu succes.');
+      return;
+    }
+
+    if (!token) {
       setStatus('Sesiunea de checkout nu a putut fi verificată.');
       return;
     }
