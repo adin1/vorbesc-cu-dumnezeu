@@ -1,26 +1,26 @@
-# Vorbește cu Dumnezeu
+# Vorbe╚Öte cu Dumnezeu
 
-MVP spiritual creștin, fără API extern AI, cu ghid spiritual bazat pe date predefinite din baza de date.
+MVP spiritual cre╚Ötin, f─âr─â API extern AI, cu ghid spiritual bazat pe date predefinite din baza de date.
 
-## Aplicație live
+## Aplica╚¢ie live
 - https://vorbeste-cu-dumnezeu.vercel.app
 
 ## Stack
 - Frontend: Next.js 16 + TypeScript
 - Backend: NestJS 10 + Prisma
-- Bază locală: SQLite
-- Producție recomandată: PostgreSQL
+- Baz─â local─â: SQLite
+- Produc╚¢ie recomandat─â: PostgreSQL
 
-## Instalare și rulare locală
-1. Instalează dependențele:
+## Instalare ╚Öi rulare local─â
+1. Instaleaz─â dependen╚¢ele:
    - `npm install`
-2. Configurează variabilele de mediu:
-   - copiază `.env.example` în `.env`
-3. Rulează migrațiile:
+2. Configureaz─â variabilele de mediu:
+   - copiaz─â `.env.example` ├«n `.env`
+3. Ruleaz─â migra╚¢iile:
    - `npm run db:migrate`
-4. Rulează seed-ul cu date reale demo:
+4. Ruleaz─â seed-ul cu date reale demo:
    - `npm run db:seed`
-5. Pornește aplicația:
+5. Porne╚Öte aplica╚¢ia:
    - `npm run dev`
 
 ## Comenzi principale
@@ -33,26 +33,26 @@ MVP spiritual creștin, fără API extern AI, cu ghid spiritual bazat pe date pr
 
 ## Date demo login
 - Email: `demo@vorbesc-cu-dumnezeu.ro`
-- Parolă: `Demo1234!`
+- Parol─â: `Demo1234!`
 
 ## Endpointuri principale
 - Auth: `/auth/register`, `/auth/login`, `/auth/me`
 - Ghid spiritual: `/spiritual-guide/moods`, `/spiritual-guide/daily`, `/spiritual-guide/message`
-- Rugăciuni: `/prayers`, `/prayers/categories`, `/prayers/:id/save`
+- Rug─âciuni: `/prayers`, `/prayers/categories`, `/prayers/:id/save`
 - Jurnal: `/journal`, `/journal/export`
 - Planuri: `/plans`, `/plans/:id`, `/plans/:id/start`, `/plans/progress/:id`
 - Comunitate: `/prayer-requests`, `/prayer-requests/:id/support`, `/prayer-requests/:id/report`
 - Moderare comunitate (admin): `/prayer-requests/moderation/pending`, `/prayer-requests/moderation/:id`
 - Analytics: `/analytics/acquisition`
 - Profil: `/profile`, `/profile/preferences`, `/profile/favorite-verses`, `/profile/saved-prayers`
-- Notificări: `/notifications`, `/notifications/:id/read`, `/notifications/read-all`
+- Notific─âri: `/notifications`, `/notifications/:id/read`, `/notifications/read-all`
 - Admin: `/admin/metrics`
 - Health: `/health`
 
 ## Health check
 `GET /health`
 
-Răspuns:
+R─âspuns:
 
 ```json
 {
@@ -67,31 +67,31 @@ Răspuns:
 - Backend: Railway / Render / Fly.io
 - DB: PostgreSQL
 
-Setări producție:
+Set─âri produc╚¢ie:
 - `DATABASE_URL` -> PostgreSQL
-- `JWT_SECRET` -> valoare puternică
+- `JWT_SECRET` -> valoare puternic─â
 - `NEXT_PUBLIC_API_URL` -> URL backend public
 - `FRONTEND_URL` -> domeniul frontend pentru CORS
 - `STRIPE_SECRET_KEY` -> cheie Stripe secret (backend)
 - `STRIPE_WEBHOOK_SECRET` -> secret webhook Stripe (backend)
-- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` -> cheie Stripe publică (frontend)
-- `NEXT_PUBLIC_APP_URL` -> URL aplicație publică
-- `NEXT_PUBLIC_PRIVACY_URL` -> URL pagină privacy policy
-- `NEXT_PUBLIC_TERMS_URL` -> URL pagină terms
-- `NEXT_PUBLIC_DISCLAIMER_URL` -> URL pagină disclaimer
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` -> cheie Stripe public─â (frontend)
+- `NEXT_PUBLIC_APP_URL` -> URL aplica╚¢ie public─â
+- `NEXT_PUBLIC_PRIVACY_URL` -> URL pagin─â privacy policy
+- `NEXT_PUBLIC_TERMS_URL` -> URL pagin─â terms
+- `NEXT_PUBLIC_DISCLAIMER_URL` -> URL pagin─â disclaimer
 
 Ghid complet pas cu pas (Vercel + Railway):
 - vezi `DEPLOY.md`
 
-## Monetizare Freemium + Donații
+## Monetizare Freemium + Dona╚¢ii
 
-Modelul de monetizare este discret, fără reclame agresive, iar funcțiile spirituale esențiale rămân disponibile gratuit.
+Modelul de monetizare este discret, f─âr─â reclame agresive, iar func╚¢iile spirituale esen╚¢iale r─âm├ón disponibile gratuit.
 
 ### Planuri
 
 - Gratuit
    - versetul zilei
-   - rugăciuni de bază
+   - rug─âciuni de baz─â
    - jurnal simplu
    - comunitate
    - 3 planuri spirituale gratuite
@@ -100,18 +100,18 @@ Modelul de monetizare este discret, fără reclame agresive, iar funcțiile spir
    - toate planurile spirituale
    - favorite nelimitate
    - teme premium
-   - rugăciuni audio
+   - rug─âciuni audio
    - export PDF elegant
-   - notificări personalizate
+   - notific─âri personalizate
 
 - Premium Family
-   - toate funcțiile premium
+   - toate func╚¢iile premium
    - profiluri familie
    - jurnal comun
-   - planuri pentru părinți/copii
-   - acces anticipat la funcții noi
+   - planuri pentru p─ârin╚¢i/copii
+   - acces anticipat la func╚¢ii noi
 
-### Pagini și endpoint-uri monetizare
+### Pagini ╚Öi endpoint-uri monetizare
 
 - Frontend:
    - `/premium`
@@ -131,7 +131,7 @@ Modelul de monetizare este discret, fără reclame agresive, iar funcțiile spir
 
 ### Configurare Stripe Sandbox (local)
 
-1. Setează în `.env`:
+1. Seteaz─â ├«n `.env`:
 
 ```env
 STRIPE_SECRET_KEY=""
@@ -139,56 +139,24 @@ STRIPE_WEBHOOK_SECRET=""
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=""
 ```
 
-2. Pornește aplicația:
+2. Porne╚Öte aplica╚¢ia:
 
 ```bash
 npm run dev
 ```
 
-3. Rulează Stripe CLI pentru webhook:
+3. Ruleaz─â Stripe CLI pentru webhook:
 
 ```bash
 stripe listen --forward-to http://localhost:3001/monetization/webhook
 ```
 
-4. Copiază secretul generat de Stripe CLI în `STRIPE_WEBHOOK_SECRET`.
-
-### Varianta fără PFA/SRL acum: Lemon Squeezy (Merchant of Record)
-
-Pentru lansare fără entitate juridică proprie imediată, poți folosi Lemon Squeezy ca Merchant of Record.
-
-1. Setează în backend:
-
-```env
-PAYMENT_PROVIDER="LEMONSQUEEZY"
-LEMONSQUEEZY_WEBHOOK_SECRET=""
-LEMONSQUEEZY_CHECKOUT_URL_PREMIUM_BASIC=""
-LEMONSQUEEZY_CHECKOUT_URL_PREMIUM_FAMILY=""
-LEMONSQUEEZY_CHECKOUT_URL_DONATION_500=""
-LEMONSQUEEZY_CHECKOUT_URL_DONATION_1000=""
-LEMONSQUEEZY_CHECKOUT_URL_DONATION_2500=""
-LEMONSQUEEZY_CHECKOUT_URL_DONATION_5000=""
-```
-
-2. Configurează webhook Lemon Squeezy către:
-   - `https://<backend>/monetization/webhook`
-
-3. Evenimente recomandate în Lemon Squeezy:
-   - `order_created`
-   - `subscription_created`
-   - `subscription_updated`
-   - `subscription_cancelled`
-   - `subscription_expired`
-
-4. Frontend-ul nu necesită cheie publică suplimentară pentru Lemon Squeezy.
-
-5. Setup rapid în Railway din terminal (interactiv):
-   - `powershell -ExecutionPolicy Bypass -File scripts/set-lemon-railway-vars.ps1`
+4. Copiaz─â secretul generat de Stripe CLI ├«n `STRIPE_WEBHOOK_SECRET`.
 
 ### Testare Stripe Sandbox
 
 - Card valid: `4242 4242 4242 4242`
-- Expirare: orice dată viitoare
+- Expirare: orice dat─â viitoare
 - CVC: orice 3 cifre
 - ZIP/Postal: orice cod valid
 - Webhook URL: `https://backend-api-production-7f6a.up.railway.app/monetization/webhook`
@@ -199,25 +167,25 @@ LEMONSQUEEZY_CHECKOUT_URL_DONATION_5000=""
    - `customer.subscription.deleted`
    - `payment_intent.succeeded`
 
-### Verificări înainte de deploy producție
+### Verific─âri ├«nainte de deploy produc╚¢ie
 
-- `npm run build` fără erori
-- `npm run test` backend fără erori
+- `npm run build` f─âr─â erori
+- `npm run test` backend f─âr─â erori
 - `npm run db:migrate` pe baza de date PostgreSQL
-- webhook Stripe configurat în Dashboard pe URL-ul backend-ului public:
+- webhook Stripe configurat ├«n Dashboard pe URL-ul backend-ului public:
    - `https://<backend>/monetization/webhook`
 
-### Deploy producție (Vercel + Railway/Fly.io)
+### Deploy produc╚¢ie (Vercel + Railway/Fly.io)
 
 - Frontend (Vercel):
-   - setează `NEXT_PUBLIC_API_URL`
-   - setează `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
+   - seteaz─â `NEXT_PUBLIC_API_URL`
+   - seteaz─â `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
 
 - Backend (Railway/Fly.io):
-   - setează `DATABASE_URL` PostgreSQL
-   - setează `STRIPE_SECRET_KEY`
-   - setează `STRIPE_WEBHOOK_SECRET`
-   - setează `FRONTEND_URL`
+   - seteaz─â `DATABASE_URL` PostgreSQL
+   - seteaz─â `STRIPE_SECRET_KEY`
+   - seteaz─â `STRIPE_WEBHOOK_SECRET`
+   - seteaz─â `FRONTEND_URL`
 
 ## Comunitate Facebook (integrare manuala)
 
@@ -307,7 +275,7 @@ Pagina publica pentru comunitate:
 
 ### 5) Calendar editorial si texte gata de postat
 
-Pentru activitate reala, legala si autentica in Facebook (fara boți, fara like-uri artificiale, fara comentarii false), foloseste fisierul:
+Pentru activitate reala, legala si autentica in Facebook (fara bo╚¢i, fara like-uri artificiale, fara comentarii false), foloseste fisierul:
 
 - `FACEBOOK_COMMUNITY_PLAN.md`
 
@@ -329,29 +297,29 @@ Acesta include:
 
 ## Disclaimer oficial
 
-Aplicația afișează pe ecranele principale următorul disclaimer:
+Aplica╚¢ia afi╚Öeaz─â pe ecranele principale urm─âtorul disclaimer:
 
-"Această aplicație oferă rugăciuni, reflecții și sprijin spiritual. Nu înlocuiește ajutorul medical, psihologic, juridic sau pastoral."
+"Aceast─â aplica╚¢ie ofer─â rug─âciuni, reflec╚¢ii ╚Öi sprijin spiritual. Nu ├«nlocuie╚Öte ajutorul medical, psihologic, juridic sau pastoral."
 
-Aplicația nu vorbește în numele lui Dumnezeu, nu promite vindecări și nu oferă garanții spirituale.
+Aplica╚¢ia nu vorbe╚Öte ├«n numele lui Dumnezeu, nu promite vindec─âri ╚Öi nu ofer─â garan╚¢ii spirituale.
 
-## GDPR și legal compliance
+## GDPR ╚Öi legal compliance
 
 - Rute publice legale:
    - `/privacy-policy`
    - `/terms`
    - `/disclaimer`
-- Alias menținute pentru compatibilitate:
+- Alias men╚¢inute pentru compatibilitate:
    - `/privacy`
-- Gestionare consimțământ cookie/analytics/marketing:
-   - banner global de consimțământ
-   - setări în profil
-- Funcții GDPR în profil:
+- Gestionare consim╚¢─âm├ónt cookie/analytics/marketing:
+   - banner global de consim╚¢─âm├ónt
+   - set─âri ├«n profil
+- Func╚¢ii GDPR ├«n profil:
    - export date
-   - descărcare date personale
-   - ștergere cont
+   - desc─ârcare date personale
+   - ╚Ötergere cont
 
-Documente legale în root:
+Documente legale ├«n root:
 - `privacy-policy.md`
 - `terms-of-service.md`
 - `spiritual-disclaimer.md`
@@ -360,16 +328,16 @@ Documente legale în root:
 
 - `helmet` activ pentru secure headers
 - rate limiting global (`120 req/min/IP`)
-- filtru global pentru excepții în producție (fără stack trace în răspuns)
-- verificare strictă `JWT_SECRET` în producție (refuză pornirea cu secret invalid)
+- filtru global pentru excep╚¢ii ├«n produc╚¢ie (f─âr─â stack trace ├«n r─âspuns)
+- verificare strict─â `JWT_SECRET` ├«n produc╚¢ie (refuz─â pornirea cu secret invalid)
 
-## Pregătire Google Play (PWA/TWA)
+## Preg─âtire Google Play (PWA/TWA)
 
-- Manifest + Service Worker de bază în frontend
+- Manifest + Service Worker de baz─â ├«n frontend
 - Manifest static suplimentar: `apps/frontend/public/manifest.json`
 - Pagini publice: `/privacy-policy`, `/terms`, `/disclaimer`
-- Asset-uri de publicare în `play-store-assets/`
-- Fișiere obligatorii:
+- Asset-uri de publicare ├«n `play-store-assets/`
+- Fi╚Öiere obligatorii:
    - `play-store-assets/content-rating.md`
    - `play-store-assets/data-safety.md`
 - Pentru TWA (Bubblewrap):

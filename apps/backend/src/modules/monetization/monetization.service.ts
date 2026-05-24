@@ -6,7 +6,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { createHmac, randomUUID, timingSafeEqual } from 'crypto';
 import Stripe from 'stripe';
 import { PrismaService } from '../../database/prisma.service';
 import { CreateDonationCheckoutDto, CreateSubscriptionCheckoutDto } from './dto';
@@ -28,8 +27,6 @@ type ParsedSubscriptionPlan = {
   isActive: boolean;
   createdAt: Date;
 };
-
-type PaymentProvider = 'STRIPE' | 'LEMONSQUEEZY';
 
 type AdminMonetizationMetrics = {
   totalDonations: number;
@@ -57,15 +54,11 @@ const FEATURE_TO_PLAN: Record<string, 'gratuit' | 'premium-basic' | 'premium-fam
 export class MonetizationService {
   private readonly logger = new Logger(MonetizationService.name);
   private readonly stripe: Stripe | null;
-  private readonly paymentProvider: PaymentProvider;
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly configService: ConfigService,
   ) {
-    const configuredProvider = this.configService.get<string>('PAYMENT_PROVIDER', 'STRIPE').toUpperCase();
-    this.paymentProvider = configuredProvider === 'LEMONSQUEEZY' ? 'LEMONSQUEEZY' : 'STRIPE';
-
     const secretKey = this.configService.get<string>('STRIPE_SECRET_KEY', '');
     this.stripe = secretKey
       ? new Stripe(secretKey, {
@@ -141,10 +134,6 @@ export class MonetizationService {
   }
 
   async createSubscriptionCheckoutSession(userId: string, dto: CreateSubscriptionCheckoutDto) {
-    if (this.paymentProvider === 'LEMONSQUEEZY') {
-      return this.createLemonSubscriptionCheckout(userId, dto);
-    }
-
     const stripe = this.getStripe();
     const [user, plan] = await Promise.all([
       this.prisma.user.findUnique({ where: { id: userId } }),
@@ -152,7 +141,7 @@ export class MonetizationService {
     ]);
 
     if (!user) {
-      throw new NotFoundException('Utilizatorul nu a fost găsit.');
+      throw new NotFoundException('Utilizatorul nu a fost g─âsit.');
     }
 
     if (!plan || !plan.isActive) {
@@ -160,7 +149,7 @@ export class MonetizationService {
     }
 
     if (plan.priceMonthly <= 0) {
-      throw new BadRequestException('Planul gratuit nu necesită checkout.');
+      throw new BadRequestException('Planul gratuit nu necesit─â checkout.');
     }
 
     const session = await stripe.checkout.sessions.create({
@@ -204,15 +193,11 @@ export class MonetizationService {
   }
 
   async createDonationCheckoutSession(userId: string, dto: CreateDonationCheckoutDto) {
-    if (this.paymentProvider === 'LEMONSQUEEZY') {
-      return this.createLemonDonationCheckout(userId, dto);
-    }
-
     const stripe = this.getStripe();
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
 
     if (!user) {
-      throw new NotFoundException('Utilizatorul nu a fost găsit.');
+      throw new NotFoundException('Utilizatorul nu a fost g─âsit.');
     }
 
     const currency = 'ron';
@@ -228,8 +213,8 @@ export class MonetizationService {
             currency,
             unit_amount: dto.amount,
             product_data: {
-              name: 'Susținere comunitate',
-              description: 'Contribuție pentru dezvoltarea calmă și discretă a aplicației Vorbește cu Dumnezeu.',
+              name: 'Sus╚¢inere comunitate',
+              description: 'Contribu╚¢ie pentru dezvoltarea calm─â ╚Öi discret─â a aplica╚¢iei Vorbe╚Öte cu Dumnezeu.',
             },
           },
         },
@@ -250,28 +235,12 @@ export class MonetizationService {
   }
 
   async verifyCheckoutSession(userId: string, sessionId: string) {
-    if (this.paymentProvider === 'LEMONSQUEEZY') {
-      return {
-        id: sessionId,
-        status: 'complete',
-        paymentStatus: 'paid',
-        mode: 'payment',
-        amountTotal: null,
-        currency: null,
-        customerEmail: null,
-        metadata: {
-          provider: 'LEMONSQUEEZY',
-          userId,
-        },
-      };
-    }
-
     const stripe = this.getStripe();
     const session = await stripe.checkout.sessions.retrieve(sessionId);
     const metadataUserId = session.metadata?.userId;
 
     if (metadataUserId && metadataUserId !== userId) {
-      throw new ForbiddenException('Această sesiune nu aparține utilizatorului curent.');
+      throw new ForbiddenException('Aceast─â sesiune nu apar╚¢ine utilizatorului curent.');
     }
 
     return {
@@ -293,7 +262,7 @@ export class MonetizationService {
     });
 
     if (!subscription) {
-      throw new NotFoundException('Abonamentul nu a fost găsit.');
+      throw new NotFoundException('Abonamentul nu a fost g─âsit.');
     }
 
     if (subscription.provider === 'STRIPE' && subscription.providerSubscriptionId) {
@@ -325,7 +294,7 @@ export class MonetizationService {
       data: {
         userId,
         title: 'Abonament actualizat',
-        body: `Abonamentul ${subscription.plan.name} a fost trecut în starea de anulare la finalul perioadei curente.`,
+        body: `Abonamentul ${subscription.plan.name} a fost trecut ├«n starea de anulare la finalul perioadei curente.`,
       },
     });
 
@@ -333,19 +302,15 @@ export class MonetizationService {
   }
 
   async handleWebhook(signature: string | string[] | undefined, rawBody?: Buffer) {
-    if (this.paymentProvider === 'LEMONSQUEEZY') {
-      return this.handleLemonWebhook(signature, rawBody);
-    }
-
     const stripe = this.getStripe();
     const webhookSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET', '');
 
     if (!webhookSecret) {
-      throw new BadRequestException('STRIPE_WEBHOOK_SECRET lipsește');
+      throw new BadRequestException('STRIPE_WEBHOOK_SECRET lipse╚Öte');
     }
 
     if (!rawBody || !signature || Array.isArray(signature)) {
-      throw new BadRequestException('Semnătura Stripe nu este disponibilă.');
+      throw new BadRequestException('Semn─âtura Stripe nu este disponibil─â.');
     }
 
     const event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
@@ -411,7 +376,7 @@ export class MonetizationService {
     const count = await this.prisma.favoriteVerse.count({ where: { userId } });
     if (count >= 10) {
       throw new ForbiddenException(
-        'Ai ajuns la limita planului gratuit pentru versete favorite. Descoperă Premium pentru favorite nelimitate.',
+        'Ai ajuns la limita planului gratuit pentru versete favorite. Descoper─â Premium pentru favorite nelimitate.',
       );
     }
   }
@@ -419,7 +384,7 @@ export class MonetizationService {
   async assertPlanAccess(userId: string, planId: string) {
     const plan = await this.prisma.spiritualPlan.findUnique({ where: { id: planId } });
     if (!plan) {
-      throw new NotFoundException('Planul spiritual nu a fost găsit.');
+      throw new NotFoundException('Planul spiritual nu a fost g─âsit.');
     }
 
     if (!plan.isPremium) {
@@ -429,7 +394,7 @@ export class MonetizationService {
     const neededFeature = plan.premiumTier === 'PREMIUM_FAMILY' ? 'family-profiles' : 'audio-prayers';
     const allowed = await this.hasFeatureAccess(userId, neededFeature);
     if (!allowed) {
-      throw new ForbiddenException('Acest plan face parte din experiența Premium.');
+      throw new ForbiddenException('Acest plan face parte din experien╚¢a Premium.');
     }
 
     return plan;
@@ -466,7 +431,7 @@ export class MonetizationService {
 
   private getStripe() {
     if (!this.stripe) {
-      throw new BadRequestException('STRIPE_SECRET_KEY lipsește');
+      throw new BadRequestException('STRIPE_SECRET_KEY lipse╚Öte');
     }
 
     return this.stripe;
@@ -503,295 +468,6 @@ export class MonetizationService {
     }
   }
 
-  private async createLemonSubscriptionCheckout(userId: string, dto: CreateSubscriptionCheckoutDto) {
-    const [user, plan] = await Promise.all([
-      this.prisma.user.findUnique({ where: { id: userId } }),
-      this.prisma.subscriptionPlan.findUnique({ where: { slug: dto.planSlug } }),
-    ]);
-
-    if (!user) {
-      throw new NotFoundException('Utilizatorul nu a fost găsit.');
-    }
-
-    if (!plan || !plan.isActive) {
-      throw new NotFoundException('Planul selectat nu este disponibil.');
-    }
-
-    if (plan.priceMonthly <= 0) {
-      throw new BadRequestException('Planul gratuit nu necesită checkout.');
-    }
-
-    const checkoutUrl = this.getLemonSubscriptionCheckoutUrl(plan.slug);
-    const successUrl = `${this.getFrontendBaseUrl()}/premium/success?provider=lemonsqueezy&type=subscription`;
-    const url = this.buildLemonCheckoutUrl(checkoutUrl, user.email, successUrl, {
-      type: 'subscription',
-      userId,
-      planSlug: plan.slug,
-    });
-
-    return {
-      sessionId: `ls_${randomUUID()}`,
-      url,
-    };
-  }
-
-  private async createLemonDonationCheckout(userId: string, dto: CreateDonationCheckoutDto) {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!user) {
-      throw new NotFoundException('Utilizatorul nu a fost găsit.');
-    }
-
-    const checkoutUrl = this.getLemonDonationCheckoutUrl(dto.amount);
-    const successUrl = `${this.getFrontendBaseUrl()}/premium/success?provider=lemonsqueezy&type=donation`;
-    const url = this.buildLemonCheckoutUrl(checkoutUrl, user.email, successUrl, {
-      type: 'donation',
-      userId,
-      amount: String(dto.amount),
-      currency: 'RON',
-      message: dto.message ?? '',
-    });
-
-    return {
-      sessionId: `ls_${randomUUID()}`,
-      url,
-    };
-  }
-
-  private getLemonSubscriptionCheckoutUrl(planSlug: string) {
-    const keyByPlan: Record<string, string> = {
-      'premium-basic': 'LEMONSQUEEZY_CHECKOUT_URL_PREMIUM_BASIC',
-      'premium-family': 'LEMONSQUEEZY_CHECKOUT_URL_PREMIUM_FAMILY',
-    };
-
-    const envKey = keyByPlan[planSlug];
-    if (!envKey) {
-      throw new BadRequestException('Planul selectat nu este mapat pentru Lemon Squeezy.');
-    }
-
-    const value = this.configService.get<string>(envKey, '').trim();
-    if (!value) {
-      throw new BadRequestException(`Lipsește variabila ${envKey}`);
-    }
-
-    return value;
-  }
-
-  private getLemonDonationCheckoutUrl(amount: number) {
-    const keyByAmount: Record<number, string> = {
-      500: 'LEMONSQUEEZY_CHECKOUT_URL_DONATION_500',
-      1000: 'LEMONSQUEEZY_CHECKOUT_URL_DONATION_1000',
-      2500: 'LEMONSQUEEZY_CHECKOUT_URL_DONATION_2500',
-      5000: 'LEMONSQUEEZY_CHECKOUT_URL_DONATION_5000',
-    };
-
-    const envKey = keyByAmount[amount];
-    if (!envKey) {
-      throw new BadRequestException('Valoarea donației nu este configurată pentru Lemon Squeezy.');
-    }
-
-    const value = this.configService.get<string>(envKey, '').trim();
-    if (!value) {
-      throw new BadRequestException(`Lipsește variabila ${envKey}`);
-    }
-
-    return value;
-  }
-
-  private buildLemonCheckoutUrl(
-    baseUrl: string,
-    customerEmail: string,
-    successUrl: string,
-    custom: Record<string, string>,
-  ) {
-    const url = new URL(baseUrl);
-    url.searchParams.set('checkout[email]', customerEmail);
-    url.searchParams.set('checkout[success_url]', successUrl);
-
-    for (const [key, value] of Object.entries(custom)) {
-      if (!value) {
-        continue;
-      }
-      url.searchParams.set(`checkout[custom][${key}]`, value);
-    }
-
-    return url.toString();
-  }
-
-  private async handleLemonWebhook(signature: string | string[] | undefined, rawBody?: Buffer) {
-    const webhookSecret = this.configService.get<string>('LEMONSQUEEZY_WEBHOOK_SECRET', '').trim();
-    if (!webhookSecret) {
-      throw new BadRequestException('LEMONSQUEEZY_WEBHOOK_SECRET lipsește');
-    }
-
-    if (!rawBody || !signature || Array.isArray(signature)) {
-      throw new BadRequestException('Semnătura Lemon Squeezy nu este disponibilă.');
-    }
-
-    const payloadSignature = Buffer.from(signature.trim(), 'hex');
-    const expectedSignature = createHmac('sha256', webhookSecret).update(rawBody).digest();
-    if (
-      payloadSignature.length !== expectedSignature.length ||
-      !timingSafeEqual(payloadSignature, expectedSignature)
-    ) {
-      throw new BadRequestException('Semnătura Lemon Squeezy este invalidă.');
-    }
-
-    const payload = JSON.parse(rawBody.toString('utf8')) as {
-      meta?: { event_name?: string; custom_data?: Record<string, string> };
-      data?: {
-        id?: string;
-        attributes?: Record<string, unknown>;
-      };
-    };
-
-    const eventName = payload.meta?.event_name ?? 'unknown';
-
-    switch (eventName) {
-      case 'order_created':
-        await this.handleLemonOrderCreated(payload);
-        break;
-      case 'subscription_created':
-      case 'subscription_updated':
-      case 'subscription_cancelled':
-      case 'subscription_expired':
-        await this.handleLemonSubscriptionEvent(payload);
-        break;
-      default:
-        this.logger.debug(`Unhandled Lemon Squeezy event ${eventName}`);
-        break;
-    }
-
-    return { received: true, type: eventName };
-  }
-
-  private async handleLemonOrderCreated(payload: {
-    meta?: { custom_data?: Record<string, string> };
-    data?: { id?: string; attributes?: Record<string, unknown> };
-  }) {
-    const custom = payload.meta?.custom_data ?? {};
-    if (custom.type !== 'donation') {
-      return;
-    }
-
-    const providerPaymentId = String(payload.data?.id ?? '');
-    if (!providerPaymentId) {
-      return;
-    }
-
-    const existing = await this.prisma.donation.findFirst({ where: { providerPaymentId } });
-    if (existing) {
-      return;
-    }
-
-    const attributes = payload.data?.attributes ?? {};
-    const total = Number(attributes.total ?? custom.amount ?? 0);
-    const userId = custom.userId ?? null;
-    const currency = String(attributes.currency ?? custom.currency ?? 'RON').toUpperCase();
-
-    await this.prisma.donation.create({
-      data: {
-        userId,
-        amount: Number.isFinite(total) ? total : 0,
-        currency,
-        provider: 'LEMONSQUEEZY',
-        providerPaymentId,
-        message: custom.message ?? null,
-      },
-    });
-
-    if (userId) {
-      await this.prisma.notification.create({
-        data: {
-          userId,
-          title: 'Îți mulțumim pentru sprijin',
-          body: 'Donația ta a fost înregistrată cu succes. Mulțumim că susții comunitatea.',
-        },
-      });
-    }
-  }
-
-  private async handleLemonSubscriptionEvent(payload: {
-    meta?: { custom_data?: Record<string, string> };
-    data?: { id?: string; attributes?: Record<string, unknown> };
-  }) {
-    const custom = payload.meta?.custom_data ?? {};
-    const providerSubscriptionId = String(payload.data?.id ?? '');
-    if (!providerSubscriptionId) {
-      return;
-    }
-
-    const attributes = payload.data?.attributes ?? {};
-    const status = this.normalizeSubscriptionStatus(String(attributes.status ?? 'ACTIVE'));
-    const expiresAtRaw = attributes.renews_at ?? attributes.ends_at;
-    const expiresAt =
-      typeof expiresAtRaw === 'string' && expiresAtRaw.length > 0 ? new Date(expiresAtRaw) : null;
-
-    const existing = await this.prisma.userSubscription.findFirst({
-      where: { providerSubscriptionId },
-    });
-
-    if (existing) {
-      await this.prisma.userSubscription.update({
-        where: { id: existing.id },
-        data: { status, expiresAt },
-      });
-      return;
-    }
-
-    const userId = custom.userId;
-    const planSlug = custom.planSlug;
-    if (!userId || !planSlug) {
-      return;
-    }
-
-    const plan = await this.prisma.subscriptionPlan.findUnique({ where: { slug: planSlug } });
-    if (!plan) {
-      return;
-    }
-
-    await this.prisma.userSubscription.updateMany({
-      where: {
-        userId,
-        status: { in: ['ACTIVE', 'PAST_DUE', 'INCOMPLETE'] },
-      },
-      data: { status: 'CANCELED' },
-    });
-
-    await this.prisma.userSubscription.create({
-      data: {
-        userId,
-        planId: plan.id,
-        status,
-        startedAt: new Date(),
-        expiresAt,
-        provider: 'LEMONSQUEEZY',
-        providerSubscriptionId,
-      },
-    });
-
-    await this.prisma.notification.create({
-      data: {
-        userId,
-        title: 'Premium activat',
-        body: `Planul ${plan.name} este acum activ. Îți mulțumim că susții comunitatea.`,
-      },
-    });
-  }
-
-  private normalizeSubscriptionStatus(status: string) {
-    const normalized = status.toUpperCase();
-    if (normalized === 'CANCELLED' || normalized === 'EXPIRED') {
-      return 'CANCELED';
-    }
-    if (normalized === 'PAST_DUE' || normalized === 'UNPAID') {
-      return 'PAST_DUE';
-    }
-    if (normalized === 'ON_TRIAL') {
-      return 'ACTIVE';
-    }
-    return normalized || 'ACTIVE';
-  }
-
   private async handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     const metadata = session.metadata ?? {};
     if (metadata.type === 'donation') {
@@ -818,8 +494,8 @@ export class MonetizationService {
         await this.prisma.notification.create({
           data: {
             userId: metadata.userId,
-            title: 'Îți mulțumim pentru sprijin',
-            body: 'Donația ta a fost înregistrată cu succes. Mulțumim că susții comunitatea.',
+            title: '├Ä╚¢i mul╚¢umim pentru sprijin',
+            body: 'Dona╚¢ia ta a fost ├«nregistrat─â cu succes. Mul╚¢umim c─â sus╚¢ii comunitatea.',
           },
         });
       }
@@ -865,7 +541,7 @@ export class MonetizationService {
         data: {
           userId: metadata.userId,
           title: 'Premium activat',
-          body: `Planul ${plan.name} este acum activ. Îți mulțumim că susții comunitatea.`,
+          body: `Planul ${plan.name} este acum activ. ├Ä╚¢i mul╚¢umim c─â sus╚¢ii comunitatea.`,
         },
       });
     }
@@ -911,8 +587,8 @@ export class MonetizationService {
     await this.prisma.notification.create({
       data: {
         userId: record.userId,
-        title: 'Plată nereușită',
-        body: 'Nu am putut procesa ultima plată pentru abonamentul tău. Poți verifica metoda de plată din Stripe.',
+        title: 'Plat─â nereu╚Öit─â',
+        body: 'Nu am putut procesa ultima plat─â pentru abonamentul t─âu. Po╚¢i verifica metoda de plat─â din Stripe.',
       },
     });
   }
