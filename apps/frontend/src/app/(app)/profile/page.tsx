@@ -7,6 +7,8 @@ import { FacebookCommunityCard } from '@/components/ui/FacebookCommunityCard';
 import { PrivacySettings } from '@/components/ui/PrivacySettings';
 import { PremiumFeatureCard } from '@/components/ui/PremiumFeatureCard';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { SocialCtaSection } from '@/components/social/SocialCtaSection';
+import { SocialLinksCard } from '@/components/social/SocialLinksCard';
 import { TikTokCommunityCard } from '@/components/social/TikTokCommunityCard';
 import {
   addFavoriteVerse,
@@ -579,6 +581,8 @@ export default function ProfilePage() {
       ) : null}
       <FacebookCommunityCard />
       <TikTokCommunityCard />
+      <SocialLinksCard campaign="profile_social_links" />
+      <SocialCtaSection source="tiktok" medium="landing" />
       <PrivacySettings />
       {status ? <p className="muted">{status}</p> : null}
     </div>

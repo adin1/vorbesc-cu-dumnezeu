@@ -433,3 +433,73 @@ SOCIAL_TRACKING_ENABLED="true"
    - f─âr─â presiune emo╚¢ional─â
    - f─âr─â promisiuni spirituale
    - f─âr─â countdown-uri false sau urgen╚¢─â artificial─â
+
+## TikTok growth runbook (latest)
+
+### Link in bio and landing
+
+- TikTok profile: https://www.tiktok.com/@vorbestecudumnezeu
+- Bio URL: https://vorbeste-cu-dumnezeu.vercel.app/tiktok
+- Recommended bio UTM URL:
+  - https://vorbeste-cu-dumnezeu.vercel.app/tiktok?utm_source=tiktok&utm_medium=bio&utm_campaign=lansare
+
+### Required env values
+
+Set in `.env` or deployment platforms:
+
+```env
+NEXT_PUBLIC_TIKTOK_URL="https://www.tiktok.com/@vorbestecudumnezeu"
+NEXT_PUBLIC_TIKTOK_LANDING_URL="/tiktok"
+NEXT_PUBLIC_FACEBOOK_GROUP_URL="https://www.facebook.com/groups/vorbestecudumnezeu"
+NEXT_PUBLIC_APP_URL="https://vorbeste-cu-dumnezeu.vercel.app"
+SOCIAL_TRACKING_ENABLED="true"
+```
+
+### Manual /tiktok validation steps
+
+1. Run app locally: `npm run dev`
+2. Open: `http://localhost:3000/tiktok?utm_source=tiktok&utm_medium=video&utm_campaign=lansare`
+3. Check visible CTA buttons:
+   - `Deschide aplicația`
+   - `Intră în comunitatea Facebook`
+   - `Susține comunitatea`
+4. Click each CTA and verify UTM params are present (`utm_source`, `utm_medium`, `utm_campaign`).
+5. Confirm Open Graph image is loaded from `/social/tiktok-preview.png`.
+
+### Admin traffic tracking for TikTok
+
+1. Login with an ADMIN account.
+2. Open `/admin`.
+3. Validate metrics under social and monetization:
+   - TikTok visitors
+   - registrations from TikTok
+   - TikTok donations started/completed
+   - TikTok premium starts
+   - conversion TikTok -> Premium
+4. Export CSV from social dashboard and archive weekly reports.
+
+### Anti-spam promotion rules
+
+- No bots, auto-comments, or fake engagement.
+- No guilt framing or emotional pressure in donation CTA.
+- No false urgency or manipulated scarcity.
+- Keep moderation filters active for spam and toxic keywords.
+
+### First 7 days posting plan
+
+1. Day 1: Intro video pinned + bio URL verification.
+2. Day 2: Versetul zilei short + CTA către `/tiktok`.
+3. Day 3: Rugăciune scurtă pentru anxietate + saved comments FAQ.
+4. Day 4: Jurnal spiritual demo in 20 seconds.
+5. Day 5: Community post invitation + Facebook group mention.
+6. Day 6: Transparent Premium/donation explainer (no pressure).
+7. Day 7: Weekly recap with 3 lessons + invite to app routine.
+
+### Content assets in repository
+
+- `content/tiktok/profile-setup.md`
+- `content/tiktok/settings-checklist.md`
+- `content/tiktok/content-calendar-30-days.md`
+- `content/tiktok/video-scripts-20.md`
+- `content/tiktok/pinned-videos.md`
+- `content/tiktok/hashtags.md`

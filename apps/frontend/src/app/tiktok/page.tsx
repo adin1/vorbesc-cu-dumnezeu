@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { SocialCtaSection } from '@/components/social/SocialCtaSection';
+import { SocialLinksCard } from '@/components/social/SocialLinksCard';
 import { Card } from '@/components/ui/Card';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 
@@ -11,25 +13,24 @@ const appBaseUrl =
 const tiktokPageUrl = `${appBaseUrl}/tiktok`;
 
 export const metadata: Metadata = {
-  title: 'Vorbește cu Dumnezeu - Rugăciuni și versete pentru fiecare zi',
+  title: 'Vorbește cu Dumnezeu — Rugăciuni și versete pentru fiecare zi',
   description: 'Aplicație spirituală cu rugăciuni, versete, jurnal și comunitate.',
   openGraph: {
-    title: 'Vorbește cu Dumnezeu - Rugăciuni și versete pentru fiecare zi',
+    title: 'Vorbește cu Dumnezeu — Rugăciuni și versete pentru fiecare zi',
     description: 'Aplicație spirituală cu rugăciuni, versete, jurnal și comunitate.',
     url: tiktokPageUrl,
     images: ['/social/tiktok-preview.png'],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Vorbește cu Dumnezeu - Rugăciuni și versete pentru fiecare zi',
+    title: 'Vorbește cu Dumnezeu — Rugăciuni și versete pentru fiecare zi',
     description: 'Aplicație spirituală cu rugăciuni, versete, jurnal și comunitate.',
     images: ['/social/tiktok-preview.png'],
   },
 };
 
 export default function TikTokLandingPage() {
-  const appUrl = '/?utm_source=tiktok&utm_medium=landing&utm_campaign=profile';
-  const premiumUrl = '/premium?utm_source=tiktok&utm_medium=landing&utm_campaign=monetizare';
+  const appUrl = '/?utm_source=tiktok&utm_medium=landing&utm_campaign=lansare';
   const groupUrl = process.env.NEXT_PUBLIC_FACEBOOK_GROUP_URL?.trim();
   const groupUrlWithUtm = groupUrl
     ? `${groupUrl}${groupUrl.includes('?') ? '&' : '?'}utm_source=tiktok&utm_medium=landing&utm_campaign=facebook_group`
@@ -74,23 +75,8 @@ export default function TikTokLandingPage() {
         </ul>
       </Card>
 
-      <Card>
-        <h3>Poți susține comunitatea prin donații sau Premium.</h3>
-        <p className="muted">
-          Susținerea este opțională, discretă și orientată către creșterea unei comunități sănătoase.
-        </p>
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-          <Link className="button" href={premiumUrl}>
-            Susține comunitatea
-          </Link>
-          <Link className="button button-secondary" href={premiumUrl}>
-            Descoperă Premium
-          </Link>
-          <Link className="button button-secondary" href={premiumUrl}>
-            Ajută proiectul să crească
-          </Link>
-        </div>
-      </Card>
+      <SocialLinksCard campaign="tiktok_landing_social_links" />
+      <SocialCtaSection source="tiktok" medium="landing" />
 
       <Card>
         <h3>Comunitatea Facebook</h3>

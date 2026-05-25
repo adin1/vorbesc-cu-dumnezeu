@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { SocialCtaSection } from '@/components/social/SocialCtaSection';
+import { SocialLinksCard } from '@/components/social/SocialLinksCard';
 import { TikTokCommunityCard } from '@/components/social/TikTokCommunityCard';
 import {
   createDonationCheckout,
@@ -195,6 +197,8 @@ export default function PremiumPage() {
       </Card>
 
       <TikTokCommunityCard />
+      <SocialLinksCard campaign="premium_social_links" />
+      <SocialCtaSection source="tiktok" medium="landing" />
 
       {summary?.activeSubscription ? (
         <Card>

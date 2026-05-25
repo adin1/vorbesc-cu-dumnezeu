@@ -7,6 +7,8 @@ import { FacebookCommunityCard } from '@/components/ui/FacebookCommunityCard';
 import { PrayerRequestCard } from '@/components/ui/PrayerRequestCard';
 import { PrayerRequestForm } from '@/components/ui/PrayerRequestForm';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { SocialCtaSection } from '@/components/social/SocialCtaSection';
+import { SocialLinksCard } from '@/components/social/SocialLinksCard';
 import { TikTokCommunityCard } from '@/components/social/TikTokCommunityCard';
 import {
   createPrayerRequestWithMode,
@@ -105,6 +107,8 @@ export default function CommunityPage() {
       </Card>
       <FacebookCommunityCard />
       <TikTokCommunityCard />
+      <SocialLinksCard campaign="community_social_links" />
+      <SocialCtaSection source="tiktok" medium="landing" />
       <Card>
         <h3>Trimite o cerere de rugaciune</h3>
         <PrayerRequestForm loading={submitting} onSubmit={handleCreate} />

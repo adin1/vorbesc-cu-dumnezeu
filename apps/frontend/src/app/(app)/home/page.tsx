@@ -7,6 +7,8 @@ import { Card } from '@/components/ui/Card';
 import { Disclaimer } from '@/components/ui/Disclaimer';
 import { FacebookCommunityCard } from '@/components/ui/FacebookCommunityCard';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { SocialCtaSection } from '@/components/social/SocialCtaSection';
+import { SocialLinksCard } from '@/components/social/SocialLinksCard';
 import { TikTokCommunityCard } from '@/components/social/TikTokCommunityCard';
 import {
   clearDashboardCache,
@@ -302,6 +304,8 @@ export default function HomePage() {
       </Card>
       <FacebookCommunityCard />
       <TikTokCommunityCard />
+      <SocialLinksCard campaign="home_social_links" />
+      <SocialCtaSection source="tiktok" medium="landing" />
       <Card>
         <h3>Recomandarea spirituală a zilei</h3>
         {recommendation ? (
