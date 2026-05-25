@@ -1,0 +1,22 @@
+name: Uptime Check
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check backend health
+        run: |
+          curl --fail --silent --show-error --max-time 20 \
+            https://vorbesc-cu-dumnezeu-backend-production.up.railway.app/health
+
+      - name: Check frontend root
+        run: |
+          curl --fail --silent --show-error --max-time 20 \
+            https://frontend-adin1s-projects.vercel.app/
