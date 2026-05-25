@@ -1,6 +1,7 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsIn, IsOptional, IsString } from 'class-validator';
 
 export class CreateAcquisitionDto {
+  @IsIn(['tiktok', 'facebook', 'direct'])
   @IsString()
   source!: string;
 

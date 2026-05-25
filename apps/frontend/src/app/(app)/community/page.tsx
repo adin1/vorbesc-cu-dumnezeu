@@ -7,6 +7,7 @@ import { FacebookCommunityCard } from '@/components/ui/FacebookCommunityCard';
 import { PrayerRequestCard } from '@/components/ui/PrayerRequestCard';
 import { PrayerRequestForm } from '@/components/ui/PrayerRequestForm';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { TikTokCommunityCard } from '@/components/ui/TikTokCommunityCard';
 import {
   createPrayerRequestWithMode,
   getPrayerRequests,
@@ -103,6 +104,7 @@ export default function CommunityPage() {
         <p className="muted" style={{ marginTop: 0 }}>Matei 18:20</p>
       </Card>
       <FacebookCommunityCard />
+      <TikTokCommunityCard />
       <Card>
         <h3>Trimite o cerere de rugaciune</h3>
         <PrayerRequestForm loading={submitting} onSubmit={handleCreate} />

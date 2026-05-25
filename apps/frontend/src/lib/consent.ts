@@ -34,6 +34,7 @@ export function saveConsentPreferences(preferences: ConsentPreferences) {
   }
 
   window.localStorage.setItem(CONSENT_KEY, JSON.stringify(preferences));
+  window.dispatchEvent(new CustomEvent('consent-preferences-updated'));
 }
 
 export function hasAnalyticsConsent() {

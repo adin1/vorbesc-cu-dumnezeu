@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { TikTokCommunityCard } from '@/components/ui/TikTokCommunityCard';
 import {
   createDonationCheckout,
   createSubscriptionCheckout,
@@ -192,6 +193,8 @@ export default function PremiumPage() {
           </Button>
         </div>
       </Card>
+
+      <TikTokCommunityCard />
 
       {summary?.activeSubscription ? (
         <Card>

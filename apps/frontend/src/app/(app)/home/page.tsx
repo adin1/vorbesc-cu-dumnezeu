@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/Card';
 import { Disclaimer } from '@/components/ui/Disclaimer';
 import { FacebookCommunityCard } from '@/components/ui/FacebookCommunityCard';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { TikTokCommunityCard } from '@/components/ui/TikTokCommunityCard';
 import {
   clearDashboardCache,
   clearDashboardCacheAll,
@@ -300,6 +301,7 @@ export default function HomePage() {
         )}
       </Card>
       <FacebookCommunityCard />
+      <TikTokCommunityCard />
       <Card>
         <h3>Recomandarea spirituală a zilei</h3>
         {recommendation ? (

@@ -1,7 +1,8 @@
-import { IsEmail, IsEnum, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsEnum, IsIn, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class RegisterAcquisitionDto {
   @IsOptional()
+  @IsIn(['tiktok', 'facebook', 'direct'])
   @IsString()
   source?: string;
 

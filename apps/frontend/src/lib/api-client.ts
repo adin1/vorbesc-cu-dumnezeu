@@ -103,6 +103,12 @@ export type AdminMetricsResponse = {
   facebookRegisteredUsers: number;
   facebookUsersStartedPlan: number;
   facebookUsersPostedPrayerRequest: number;
+  tiktokVisitors: number;
+  tiktokRegisteredUsers: number;
+  tiktokDonations: number;
+  tiktokPremiumUsers: number;
+  tiktokUsersStartedPlan: number;
+  tiktokToPremiumConversion: number;
   refreshedAt: string;
 };
 

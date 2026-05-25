@@ -344,3 +344,55 @@ Documente legale ├«n root:
    1. `npm i -g @bubblewrap/cli`
    2. `bubblewrap init --manifest https://<domeniu-frontend>/manifest.webmanifest`
    3. `bubblewrap build`
+
+## Promovare TikTok
+
+- Profil TikTok: https://www.tiktok.com/@vorbestecudumnezeu
+- Link bio recomandat:
+   - https://vorbeste-cu-dumnezeu.vercel.app?utm_source=tiktok&utm_medium=bio&utm_campaign=profile
+
+### Testare pagina /tiktok
+
+1. Porne╚Öte aplica╚¢ia local: `npm run dev`
+2. Acceseaz─â pagina: `http://localhost:3000/tiktok?utm_source=tiktok&utm_medium=video&utm_campaign=lansare`
+3. Verific─â CTA-urile:
+    - `Deschide aplicația`
+    - `Intră în comunitatea Facebook`
+    - `Susține comunitatea`
+4. Verific─â metadata social:
+    - title + description
+    - Open Graph (`/social/tiktok-preview.png`)
+    - Twitter card `summary_large_image`
+
+### Env pentru integrarea Facebook
+
+Seteaz─â ├«n `.env`:
+
+```env
+NEXT_PUBLIC_FACEBOOK_GROUP_URL="https://www.facebook.com/groups/vorbestecudumnezeu"
+NEXT_PUBLIC_TIKTOK_URL="https://www.tiktok.com/@vorbestecudumnezeu"
+NEXT_PUBLIC_APP_URL="https://vorbeste-cu-dumnezeu.vercel.app"
+```
+
+### Cum urm─âre╚Öti conversiile ├«n Admin
+
+- Mergi la `/admin` (cont cu rol ADMIN).
+- Sec╚¢iunea `Surse trafic și monetizare` afi╚Öeaz─â:
+   - vizitatori TikTok
+   - utilizatori înregistrați din TikTok
+   - donații din TikTok
+   - utilizatori premium din TikTok
+   - utilizatori TikTok care au început planuri
+   - conversie TikTok -> Premium
+   - vizitatori Facebook și înregistrați din Facebook
+
+### Promovare Premium fără agresivitate
+
+- Folose╚Öte CTA-uri discrete:
+   - `Susține comunitatea`
+   - `Descoperă Premium`
+   - `Ajută proiectul să crească`
+- Evit─â formul─âri manipulative:
+   - f─âr─â presiune emo╚¢ional─â
+   - f─âr─â promisiuni spirituale
+   - f─âr─â countdown-uri false sau urgen╚¢─â artificial─â

@@ -121,6 +121,22 @@ export default function AdminPage() {
               <div className="muted">Utilizatori premium</div>
             </div>
             <div className="card">
+              <strong>{metrics.tiktokVisitors}</strong>
+              <div className="muted">Vizitatori TikTok</div>
+            </div>
+            <div className="card">
+              <strong>{metrics.tiktokRegisteredUsers}</strong>
+              <div className="muted">Înregistrați din TikTok</div>
+            </div>
+            <div className="card">
+              <strong>{metrics.tiktokPremiumUsers}</strong>
+              <div className="muted">Premium din TikTok</div>
+            </div>
+            <div className="card">
+              <strong>{metrics.tiktokUsersStartedPlan}</strong>
+              <div className="muted">Din TikTok care au început un plan</div>
+            </div>
+            <div className="card">
               <strong>{metrics.facebookVisitors}</strong>
               <div className="muted">Vizitatori din Facebook</div>
             </div>
@@ -135,6 +151,27 @@ export default function AdminPage() {
             <div className="card">
               <strong>{metrics.facebookUsersPostedPrayerRequest}</strong>
               <div className="muted">Din Facebook care au postat cerere</div>
+            </div>
+          </div>
+          <div style={{ marginTop: 12 }}>
+            <h4>Surse trafic și monetizare</h4>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10 }}>
+              <div className="card">
+                <strong>{(metrics.tiktokDonations / 100).toFixed(2)} RON</strong>
+                <div className="muted">Donații din TikTok</div>
+              </div>
+              <div className="card">
+                <strong>{(metrics.tiktokToPremiumConversion * 100).toFixed(1)}%</strong>
+                <div className="muted">Conversie TikTok către Premium</div>
+              </div>
+              <div className="card">
+                <strong>{(metrics.totalDonations / 100).toFixed(2)} RON</strong>
+                <div className="muted">Total donații</div>
+              </div>
+              <div className="card">
+                <strong>{(metrics.estimatedMonthlyRevenue / 100).toFixed(2)} RON</strong>
+                <div className="muted">Estimare venit lunar</div>
+              </div>
             </div>
           </div>
           <div style={{ marginTop: 12 }}>

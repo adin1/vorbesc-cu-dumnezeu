@@ -7,6 +7,7 @@ import { FacebookCommunityCard } from '@/components/ui/FacebookCommunityCard';
 import { PrivacySettings } from '@/components/ui/PrivacySettings';
 import { PremiumFeatureCard } from '@/components/ui/PremiumFeatureCard';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { TikTokCommunityCard } from '@/components/ui/TikTokCommunityCard';
 import {
   addFavoriteVerse,
   deleteFavoriteVerse,
@@ -577,6 +578,7 @@ export default function ProfilePage() {
         />
       ) : null}
       <FacebookCommunityCard />
+      <TikTokCommunityCard />
       <PrivacySettings />
       {status ? <p className="muted">{status}</p> : null}
     </div>

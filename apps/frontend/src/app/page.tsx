@@ -3,13 +3,11 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { login, postAcquisition, register } from '@/lib/api-client';
+import { login, register } from '@/lib/api-client';
 import { setToken } from '@/lib/auth-token';
 import { Disclaimer } from '@/components/ui/Disclaimer';
 import { Button } from '@/components/ui/Button';
-import { hasAnalyticsConsent } from '@/lib/consent';
-
-const ACQUISITION_KEY = 'first_acquisition_payload';
+import { captureFirstAcquisition, getStoredAcquisition } from '@/lib/acquisition';
 
 export default function LandingPage() {
   const router = useRouter();
@@ -21,30 +19,7 @@ export default function LandingPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
-
-    const existing = localStorage.getItem(ACQUISITION_KEY);
-    if (existing) {
-      return;
-    }
-
-    const params = new URLSearchParams(window.location.search);
-    const source = (params.get('utm_source') || '').toLowerCase() || 'direct';
-    const payload = {
-      source,
-      medium: params.get('utm_medium') || undefined,
-      campaign: params.get('utm_campaign') || undefined,
-      landingPage: window.location.pathname,
-      referrer: document.referrer || undefined,
-      firstVisitAt: new Date().toISOString(),
-    };
-
-    localStorage.setItem(ACQUISITION_KEY, JSON.stringify(payload));
-    if (hasAnalyticsConsent()) {
-      postAcquisition(payload).catch(() => undefined);
-    }
+    captureFirstAcquisition();
   }, []);
 
   const getFriendlyError = (message: string) => {
@@ -72,10 +47,7 @@ export default function LandingPage() {
               password,
               name,
               denomination: 'GENERAL',
-              acquisition:
-                typeof window !== 'undefined' && hasAnalyticsConsent()
-                  ? JSON.parse(localStorage.getItem(ACQUISITION_KEY) || 'null') || undefined
-                  : undefined,
+              acquisition: getStoredAcquisition() ?? undefined,
             })
           : await login({ email, password });
 
