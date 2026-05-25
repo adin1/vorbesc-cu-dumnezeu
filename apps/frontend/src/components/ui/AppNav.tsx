@@ -11,6 +11,7 @@ const links = [
   { href: '/journal', label: 'Jurnal' },
   { href: '/plans', label: 'Planuri' },
   { href: '/premium', label: 'Premium' },
+  { href: '/social', label: 'Social Hub' },
   { href: '/community', label: 'Comunitate' },
   { href: '/notifications', label: 'Notificari' },
   { href: '/profile', label: 'Profil' },

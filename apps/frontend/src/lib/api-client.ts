@@ -329,6 +329,85 @@ export type DashboardCachePermissions = {
   canClearAll: boolean;
 };
 
+export type SocialHubConfig = {
+  trackingEnabled: boolean;
+  appUrl: string;
+  tiktokUrl: string;
+  facebookUrl: string;
+  ctas: {
+    tiktok: string;
+    facebook: string;
+    support: string;
+  };
+  utmRules: {
+    tiktok: string[];
+    facebook: string[];
+  };
+};
+
+export type SocialGrowthDashboard = {
+  tiktok: {
+    visitors: number;
+    registrations: number;
+    premiumConversions: number;
+    donations: number;
+    topCampaigns: Array<{ campaign: string; visitors: number }>;
+  };
+  facebook: {
+    visitors: number;
+    registrations: number;
+    prayerRequests: number;
+    startedPlans: number;
+    premiumConversions: number;
+    donations: number;
+    topCampaigns: Array<{ campaign: string; visitors: number }>;
+  };
+  app: {
+    totalActiveUsers: number;
+    dau: number;
+    wau: number;
+    retention: number;
+    conversionRates: {
+      tiktokToRegistration: number;
+      tiktokToPremium: number;
+      facebookToRegistration: number;
+      facebookToPremium: number;
+    };
+  };
+  charts: {
+    dailyTraffic: Array<{ date: string; count: number }>;
+    sourceComparison: {
+      tiktok: Array<{ date: string; count: number }>;
+      facebook: Array<{ date: string; count: number }>;
+    };
+    conversionFunnel: {
+      tiktok: {
+        visitors: number;
+        registrations: number;
+        startedPlans: number;
+        premium: number;
+      };
+      facebook: {
+        visitors: number;
+        registrations: number;
+        startedPlans: number;
+        premium: number;
+      };
+    };
+  };
+  activity: {
+    totalEvents: number;
+    latest: Array<{
+      platform: string;
+      type: string;
+      source?: string;
+      userId?: string;
+      createdAt: string;
+    }>;
+  };
+  generatedAt: string;
+};
+
 export type FavoriteVerse = {
   id: string;
   reference: string;
@@ -515,6 +594,80 @@ export function postAcquisition(payload: {
   userId?: string;
 }) {
   return request<{ id: string }>('/analytics/acquisition', 'POST', payload);
+}
+
+export function postSocialActivity(payload: {
+  platform: 'tiktok' | 'facebook' | 'app';
+  type:
+    | 'clicked_tiktok_link'
+    | 'clicked_facebook_link'
+    | 'opened_app_from_tiktok'
+    | 'opened_app_from_facebook'
+    | 'started_plan'
+    | 'created_prayer_request'
+    | 'donation_started'
+    | 'donation_completed'
+    | 'premium_started';
+  campaign?: string;
+  source?: string;
+  userId?: string;
+  metadata?: Record<string, unknown>;
+}) {
+  return request<{ id?: string; skipped?: boolean }>('/social/activity', 'POST', payload);
+}
+
+export function postSocialActivityForCurrentUser(
+  token: string,
+  payload: {
+    platform: 'tiktok' | 'facebook' | 'app';
+    type:
+      | 'clicked_tiktok_link'
+      | 'clicked_facebook_link'
+      | 'opened_app_from_tiktok'
+      | 'opened_app_from_facebook'
+      | 'started_plan'
+      | 'created_prayer_request'
+      | 'donation_started'
+      | 'donation_completed'
+      | 'premium_started';
+    campaign?: string;
+    source?: string;
+    metadata?: Record<string, unknown>;
+  },
+) {
+  return request<{ id?: string; skipped?: boolean }>('/social/activity/me', 'POST', payload, token);
+}
+
+export function getSocialHubConfig() {
+  return request<SocialHubConfig>('/social/config', 'GET');
+}
+
+export function getSocialGrowthDashboard(token: string) {
+  return request<SocialGrowthDashboard>('/social/admin/dashboard', 'GET', undefined, token);
+}
+
+export async function exportSocialGrowthCsv(
+  token: string,
+  params?: { source?: string; from?: string; to?: string },
+) {
+  const query = new URLSearchParams();
+  if (params?.source) query.set('source', params.source);
+  if (params?.from) query.set('from', params.from);
+  if (params?.to) query.set('to', params.to);
+
+  const suffix = query.toString() ? `?${query.toString()}` : '';
+  const response = await fetch(`${API_URL}/social/admin/export${suffix}`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Export failed: ${response.status}`);
+  }
+
+  return response.text();
 }
 
 export function getJournalEntries(token: string) {

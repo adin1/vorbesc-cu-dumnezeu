@@ -7,7 +7,7 @@ import { FacebookCommunityCard } from '@/components/ui/FacebookCommunityCard';
 import { PrayerRequestCard } from '@/components/ui/PrayerRequestCard';
 import { PrayerRequestForm } from '@/components/ui/PrayerRequestForm';
 import { SectionHeader } from '@/components/ui/SectionHeader';
-import { TikTokCommunityCard } from '@/components/ui/TikTokCommunityCard';
+import { TikTokCommunityCard } from '@/components/social/TikTokCommunityCard';
 import {
   createPrayerRequestWithMode,
   getPrayerRequests,

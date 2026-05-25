@@ -1,12 +1,14 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, Optional } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import { DashboardCacheService } from '../../common/dashboard-cache.service';
+import { SocialService } from '../social/social.service';
 
 @Injectable()
 export class CommunityService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly dashboardCache: DashboardCacheService,
+    @Optional() private readonly socialService?: SocialService,
   ) {}
 
   listRequests(userId?: string) {
@@ -54,6 +56,18 @@ export class CommunityService {
     });
 
     this.dashboardCache.invalidateUser(userId);
+
+    await this.socialService?.logActivity({
+      platform: 'app',
+      type: 'created_prayer_request',
+      source: 'app',
+      userId,
+      metadata: {
+        publishMode,
+        anonymous: Boolean(anonymous),
+      },
+    });
+
     return created;
   }
 

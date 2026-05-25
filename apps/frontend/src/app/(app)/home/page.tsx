@@ -7,7 +7,7 @@ import { Card } from '@/components/ui/Card';
 import { Disclaimer } from '@/components/ui/Disclaimer';
 import { FacebookCommunityCard } from '@/components/ui/FacebookCommunityCard';
 import { SectionHeader } from '@/components/ui/SectionHeader';
-import { TikTokCommunityCard } from '@/components/ui/TikTokCommunityCard';
+import { TikTokCommunityCard } from '@/components/social/TikTokCommunityCard';
 import {
   clearDashboardCache,
   clearDashboardCacheAll,

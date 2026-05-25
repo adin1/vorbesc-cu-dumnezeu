@@ -4,10 +4,12 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  Optional,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 import { PrismaService } from '../../database/prisma.service';
+import { SocialService } from '../social/social.service';
 import { CreateDonationCheckoutDto, CreateSubscriptionCheckoutDto } from './dto';
 import {
   donationThankYouTemplate,
@@ -58,6 +60,7 @@ export class MonetizationService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly configService: ConfigService,
+    @Optional() private readonly socialService?: SocialService,
   ) {
     const secretKey = this.configService.get<string>('STRIPE_SECRET_KEY', '');
     this.stripe = secretKey
@@ -186,6 +189,19 @@ export class MonetizationService {
       cancel_url: `${this.getFrontendBaseUrl()}/premium/cancel`,
     });
 
+    await this.socialService?.logActivity({
+      platform: 'app',
+      type: 'premium_started',
+      source: 'app',
+      campaign: dto.planSlug,
+      userId,
+      metadata: {
+        mode: 'subscription_checkout_started',
+        planSlug: dto.planSlug,
+        sessionId: session.id,
+      },
+    });
+
     return {
       sessionId: session.id,
       url: session.url,
@@ -226,6 +242,18 @@ export class MonetizationService {
       },
       success_url: `${this.getFrontendBaseUrl()}/premium/success?type=donation&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${this.getFrontendBaseUrl()}/premium/cancel`,
+    });
+
+    await this.socialService?.logActivity({
+      platform: 'app',
+      type: 'donation_started',
+      source: 'app',
+      userId,
+      metadata: {
+        amount: dto.amount,
+        currency,
+        sessionId: session.id,
+      },
     });
 
     return {
@@ -498,6 +526,18 @@ export class MonetizationService {
             body: 'Dona╚¢ia ta a fost ├«nregistrat─â cu succes. Mul╚¢umim c─â sus╚¢ii comunitatea.',
           },
         });
+
+        await this.socialService?.logActivity({
+          platform: 'app',
+          type: 'donation_completed',
+          source: 'app',
+          userId: metadata.userId,
+          metadata: {
+            amount: session.amount_total ?? 0,
+            currency: (session.currency ?? 'ron').toUpperCase(),
+            sessionId: session.id,
+          },
+        });
       }
 
       return;
@@ -542,6 +582,19 @@ export class MonetizationService {
           userId: metadata.userId,
           title: 'Premium activat',
           body: `Planul ${plan.name} este acum activ. ├Ä╚¢i mul╚¢umim c─â sus╚¢ii comunitatea.`,
+        },
+      });
+
+      await this.socialService?.logActivity({
+        platform: 'app',
+        type: 'premium_started',
+        source: 'app',
+        campaign: metadata.planSlug,
+        userId: metadata.userId,
+        metadata: {
+          mode: 'subscription_activated',
+          planSlug: metadata.planSlug,
+          sessionId: session.id,
         },
       });
     }

@@ -6,12 +6,15 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import {
+  exportSocialGrowthCsv,
   getAdminMetrics,
+  getSocialGrowthDashboard,
   getPendingPrayerRequests,
   me,
   moderatePrayerRequest,
   type AdminMetricsResponse,
   type PrayerRequest,
+  type SocialGrowthDashboard,
 } from '@/lib/api-client';
 import { getToken } from '@/lib/auth-token';
 
@@ -19,8 +22,11 @@ export default function AdminPage() {
   const router = useRouter();
   const [metrics, setMetrics] = useState<AdminMetricsResponse | null>(null);
   const [pendingRequests, setPendingRequests] = useState<Array<PrayerRequest & { user?: { name: string } }>>([]);
+  const [socialDashboard, setSocialDashboard] = useState<SocialGrowthDashboard | null>(null);
   const [status, setStatus] = useState('Se încarcă...');
+  const [socialStatus, setSocialStatus] = useState('Se încarcă...');
   const [loading, setLoading] = useState(false);
+  const [exportingCsv, setExportingCsv] = useState(false);
 
   const load = async () => {
     const token = getToken();
@@ -42,12 +48,43 @@ export default function AdminPage() {
       setMetrics(data);
       const pending = await getPendingPrayerRequests(token);
       setPendingRequests(pending);
+      const social = await getSocialGrowthDashboard(token);
+      setSocialDashboard(social);
       setStatus('Metricile au fost actualizate.');
+      setSocialStatus('Dashboard social actualizat.');
     } catch {
       setMetrics(null);
+      setSocialDashboard(null);
       setStatus('Nu ai acces la zona de administrare sau ceva nu a mers.');
+      setSocialStatus('Dashboard social indisponibil.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleExportCsv = async () => {
+    const token = getToken();
+    if (!token) {
+      return;
+    }
+
+    setExportingCsv(true);
+    try {
+      const csv = await exportSocialGrowthCsv(token);
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `social-growth-${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      setSocialStatus('CSV exportat cu succes.');
+    } catch {
+      setSocialStatus('Exportul CSV a eșuat.');
+    } finally {
+      setExportingCsv(false);
     }
   };
 
@@ -190,6 +227,81 @@ export default function AdminPage() {
           </div>
           <p className="muted" style={{ marginTop: 10 }}>
             Ultima actualizare: {new Date(metrics.refreshedAt).toLocaleString('ro-RO')}
+          </p>
+        </Card>
+      ) : null}
+
+      {socialDashboard ? (
+        <Card>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+            <h3 style={{ margin: 0 }}>Social Media & Growth</h3>
+            <Button type="button" variant="secondary" onClick={handleExportCsv} disabled={exportingCsv}>
+              {exportingCsv ? 'Se exportă...' : 'Export CSV'}
+            </Button>
+          </div>
+          <p className="muted" style={{ marginTop: 8 }}>{socialStatus}</p>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 10 }}>
+            <div className="card">
+              <strong>{socialDashboard.tiktok.visitors}</strong>
+              <div className="muted">TikTok visitors</div>
+            </div>
+            <div className="card">
+              <strong>{socialDashboard.tiktok.registrations}</strong>
+              <div className="muted">TikTok registrations</div>
+            </div>
+            <div className="card">
+              <strong>{socialDashboard.facebook.visitors}</strong>
+              <div className="muted">Facebook visitors</div>
+            </div>
+            <div className="card">
+              <strong>{socialDashboard.facebook.registrations}</strong>
+              <div className="muted">Facebook registrations</div>
+            </div>
+            <div className="card">
+              <strong>{socialDashboard.app.dau}</strong>
+              <div className="muted">DAU</div>
+            </div>
+            <div className="card">
+              <strong>{socialDashboard.app.wau}</strong>
+              <div className="muted">WAU</div>
+            </div>
+            <div className="card">
+              <strong>{socialDashboard.activity.totalEvents}</strong>
+              <div className="muted">Evenimente sociale</div>
+            </div>
+            <div className="card">
+              <strong>{(socialDashboard.app.retention * 100).toFixed(1)}%</strong>
+              <div className="muted">Retenție WAU/Total</div>
+            </div>
+          </div>
+
+          <div style={{ marginTop: 12 }}>
+            <h4>Funnel conversion</h4>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 10 }}>
+              <div className="card">
+                <strong>TikTok</strong>
+                <div className="muted">
+                  {socialDashboard.charts.conversionFunnel.tiktok.visitors} vizitatori →{' '}
+                  {socialDashboard.charts.conversionFunnel.tiktok.registrations} conturi →{' '}
+                  {socialDashboard.charts.conversionFunnel.tiktok.startedPlans} planuri →{' '}
+                  {socialDashboard.charts.conversionFunnel.tiktok.premium} premium
+                </div>
+              </div>
+              <div className="card">
+                <strong>Facebook</strong>
+                <div className="muted">
+                  {socialDashboard.charts.conversionFunnel.facebook.visitors} vizitatori →{' '}
+                  {socialDashboard.charts.conversionFunnel.facebook.registrations} conturi →{' '}
+                  {socialDashboard.charts.conversionFunnel.facebook.startedPlans} planuri →{' '}
+                  {socialDashboard.charts.conversionFunnel.facebook.premium} premium
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p className="muted" style={{ marginTop: 10 }}>
+            Generat la: {new Date(socialDashboard.generatedAt).toLocaleString('ro-RO')}
           </p>
         </Card>
       ) : null}

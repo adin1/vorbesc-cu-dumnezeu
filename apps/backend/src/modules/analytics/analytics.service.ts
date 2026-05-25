@@ -16,6 +16,7 @@ export class AnalyticsService {
         landingPage: dto.landingPage,
         referrer: dto.referrer,
         firstVisitAt: dto.firstVisitAt ? new Date(dto.firstVisitAt) : new Date(),
+        convertedAt: dto.convertedAt ? new Date(dto.convertedAt) : undefined,
       },
     });
   }

@@ -32,6 +32,7 @@ model User {
   subscriptions     UserSubscription[]
   donations         Donation[]
   acquisitions      UserAcquisition[]
+  socialActivities  SocialActivityLog[]
 }
 
 model SpiritualMood {
@@ -289,9 +290,26 @@ model UserAcquisition {
   landingPage String?
   referrer    String?
   firstVisitAt DateTime
+  convertedAt DateTime?
   createdAt   DateTime @default(now())
   user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([source, createdAt])
+  @@index([userId])
+}
+
+model SocialActivityLog {
+  id        String   @id @default(cuid())
+  platform  String
+  type      String
+  campaign  String?
+  source    String?
+  metadata  String?
+  userId    String?
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([platform, createdAt])
+  @@index([type, createdAt])
   @@index([userId])
 }

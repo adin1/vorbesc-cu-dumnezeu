@@ -386,6 +386,43 @@ NEXT_PUBLIC_APP_URL="https://vorbeste-cu-dumnezeu.vercel.app"
    - conversie TikTok -> Premium
    - vizitatori Facebook și înregistrați din Facebook
 
+## Sistem complet Social Hub (TikTok + Facebook + App)
+
+Fluxul integrat este centralizat în backend prin modulul `SocialModule`:
+
+- `GET /social/config` (public): configurare hub social și reguli UTM
+- `POST /social/activity` (public): log evenimente anonime/consimțite
+- `POST /social/activity/me` (auth): log evenimente pentru user autentificat
+- `GET /social/admin/dashboard` (admin): dashboard agregat de creștere
+- `GET /social/admin/export` (admin): export CSV pentru raportare externă
+
+Evenimentele urmărite în `SocialActivityLog` includ:
+
+- `clicked_tiktok_link`
+- `clicked_facebook_link`
+- `opened_app_from_tiktok`
+- `opened_app_from_facebook`
+- `started_plan`
+- `created_prayer_request`
+- `donation_started`
+- `donation_completed`
+- `premium_started`
+
+### Env recomandat pentru tracking
+
+```env
+NEXT_PUBLIC_TIKTOK_URL="https://www.tiktok.com/@vorbestecudumnezeu"
+NEXT_PUBLIC_FACEBOOK_GROUP_URL="https://www.facebook.com/groups/vorbestecudumnezeu"
+NEXT_PUBLIC_APP_URL="https://vorbeste-cu-dumnezeu.vercel.app"
+SOCIAL_TRACKING_ENABLED="true"
+```
+
+### GDPR și bune practici
+
+- Tracking-ul social respectă consimțământul analytics/cookie din aplicație.
+- Nu se folosesc boți, auto-posting sau automatizări de engagement fake.
+- Exportul CSV este disponibil doar pentru ADMIN.
+
 ### Promovare Premium fără agresivitate
 
 - Folose╚Öte CTA-uri discrete:

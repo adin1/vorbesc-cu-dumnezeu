@@ -1,12 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import { MonetizationService } from '../monetization/monetization.service';
+import { SocialService } from '../social/social.service';
 
 @Injectable()
 export class PlansService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly monetizationService: MonetizationService,
+    @Optional() private readonly socialService?: SocialService,
   ) {}
 
   async list(userId: string) {
@@ -41,7 +43,7 @@ export class PlansService {
 
   async start(userId: string, planId: string) {
     await this.monetizationService.assertPlanAccess(userId, planId);
-    return this.prisma.userPlanProgress.create({
+    const progress = await this.prisma.userPlanProgress.create({
       data: {
         userId,
         planId,
@@ -49,6 +51,16 @@ export class PlansService {
         completed: false,
       },
     });
+
+    await this.socialService?.logActivity({
+      platform: 'app',
+      type: 'started_plan',
+      source: 'app',
+      userId,
+      metadata: { planId },
+    });
+
+    return progress;
   }
 
   updateProgress(progressId: string, dayNumber: number, completed = true) {

@@ -42,6 +42,7 @@ export class AuthService {
           firstVisitAt: dto.acquisition.firstVisitAt
             ? new Date(dto.acquisition.firstVisitAt)
             : new Date(),
+          convertedAt: new Date(),
         },
       });
     }

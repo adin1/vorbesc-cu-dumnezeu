@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { SectionHeader } from '@/components/ui/SectionHeader';
-import { TikTokCommunityCard } from '@/components/ui/TikTokCommunityCard';
+import { TikTokCommunityCard } from '@/components/social/TikTokCommunityCard';
 import {
   createDonationCheckout,
   createSubscriptionCheckout,

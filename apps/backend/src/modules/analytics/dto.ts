@@ -27,5 +27,9 @@ export class CreateAcquisitionDto {
 
   @IsOptional()
   @IsString()
+  convertedAt?: string;
+
+  @IsOptional()
+  @IsString()
   userId?: string;
 }

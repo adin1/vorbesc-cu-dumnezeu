@@ -1,5 +1,5 @@
 import { hasAnalyticsConsent } from '@/lib/consent';
-import { postAcquisition } from '@/lib/api-client';
+import { postAcquisition, postSocialActivity } from '@/lib/api-client';
 
 export type AcquisitionSource = 'tiktok' | 'facebook' | 'direct';
 
@@ -15,6 +15,7 @@ export type AcquisitionPayload = {
 
 export const ACQUISITION_KEY = 'first_acquisition_payload_v2';
 const ACQUISITION_POSTED_KEY = 'first_acquisition_posted_v2';
+const SOCIAL_OPENED_POSTED_KEY = 'social_opened_app_posted_v1';
 
 const FIELD_KEYS = {
   source: 'acquisition_source',
@@ -112,4 +113,26 @@ export async function postAcquisitionIfAllowed(payload?: AcquisitionPayload | nu
 
   await postAcquisition(candidate);
   window.localStorage.setItem(ACQUISITION_POSTED_KEY, '1');
+
+  if (window.localStorage.getItem(SOCIAL_OPENED_POSTED_KEY) === '1') {
+    return;
+  }
+
+  if (candidate.source === 'tiktok' || candidate.source === 'facebook') {
+    try {
+      await postSocialActivity({
+        platform: candidate.source,
+        type: candidate.source === 'tiktok' ? 'opened_app_from_tiktok' : 'opened_app_from_facebook',
+        source: candidate.source,
+        campaign: candidate.campaign,
+        metadata: {
+          medium: candidate.medium,
+          landingPage: candidate.landingPage,
+        },
+      });
+    } catch {
+      // No-op: acquisition tracking should still succeed even if social event logging fails.
+    }
+    window.localStorage.setItem(SOCIAL_OPENED_POSTED_KEY, '1');
+  }
 }

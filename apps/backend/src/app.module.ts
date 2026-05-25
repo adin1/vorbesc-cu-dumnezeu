@@ -13,6 +13,7 @@ import { ProfileModule } from './modules/profile/profile.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { MonetizationModule } from './modules/monetization/monetization.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
+import { SocialModule } from './modules/social/social.module';
 import { PrismaService } from './database/prisma.service';
 import { CommonModule } from './common/common.module';
 import { HealthController } from './health.controller';
@@ -34,6 +35,7 @@ import { HealthController } from './health.controller';
     AdminModule,
     MonetizationModule,
     AnalyticsModule,
+    SocialModule,
   ],
   controllers: [HealthController],
   providers: [PrismaService],
